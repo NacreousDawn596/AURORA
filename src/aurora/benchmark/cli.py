@@ -15,6 +15,8 @@ from aurora.benchmark.replay import replay
 from aurora.benchmark.schema import BuildRun
 from aurora.benchmark.strategies import Strategy
 from aurora.repository.analysis import analyze_repository
+from aurora.repository.coverage import load_coverage_graph
+from aurora.repository.git import ensure_clean_head, resolve_commit
 
 
 def _add_dataset_arguments(parser: argparse.ArgumentParser) -> None:
@@ -63,6 +65,23 @@ def build_parser() -> argparse.ArgumentParser:
     analyze.add_argument("--max-files", type=int, default=10_000)
     analyze.add_argument("--max-file-bytes", type=int, default=1_000_000)
     analyze.add_argument("--output", default="-", help="JSON output path, or - for stdout")
+
+    coverage = commands.add_parser(
+        "map-coverage",
+        help="Build a per-test source-line graph from coverage.py JSON contexts",
+    )
+    coverage.add_argument("--repo-path", required=True, help="Path to a local Git repository")
+    coverage.add_argument("--revision", required=True, help="Git revision used for the coverage run")
+    coverage.add_argument("--coverage-json", required=True, help="coverage.py JSON report path")
+    coverage.add_argument(
+        "--changed-path",
+        action="append",
+        default=[],
+        help="Changed repository-relative source path; repeat for multiple paths",
+    )
+    coverage.add_argument("--timeout-seconds", type=float, default=30.0)
+    coverage.add_argument("--max-report-bytes", type=int, default=50_000_000)
+    coverage.add_argument("--output", default="-", help="JSON output path, or - for stdout")
     return parser
 
 
@@ -96,6 +115,32 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     try:
+        if args.command == "map-coverage":
+            repository = Path(args.repo_path).expanduser().resolve()
+            revision = resolve_commit(
+                repository,
+                args.revision,
+                timeout_seconds=args.timeout_seconds,
+            )
+            ensure_clean_head(
+                repository,
+                revision,
+                timeout_seconds=args.timeout_seconds,
+            )
+            graph = load_coverage_graph(
+                args.coverage_json,
+                repository,
+                revision,
+                max_report_bytes=args.max_report_bytes,
+            )
+            payload = graph.to_dict()
+            payload["changed_paths"] = list(args.changed_path)
+            payload["covered_test_contexts_by_changed_path"] = {
+                path: list(graph.tests_for_paths([path])) for path in args.changed_path
+            }
+            _write_json(payload, args.output)
+            return 0
+
         if args.command == "analyze-repo":
             report = analyze_repository(
                 args.repo_path,

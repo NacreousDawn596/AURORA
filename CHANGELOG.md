@@ -16,14 +16,17 @@ All notable changes are documented here. Dates use ISO 8601.
 - Safe Git revision resolution and repository diff ingestion.
 - Non-executing Python AST import/symbol/call extraction.
 - Python import graph and transitive impacted-test candidate report.
-- `aurora-benchmark analyze-repo` command and repository-intelligence documentation.
-- Unit tests for schema, ingestion, history, splits, strategies, metrics, replay, manifests, CLI, Git, AST and dependency traversal.
+- aurora-benchmark analyze-repo command and repository-intelligence documentation.
+- coverage.py JSON context ingestion and test-to-source-file graph.
+- aurora-benchmark map-coverage command with changed-path lookup, source-path validation and report checksum.
+- Coverage graph tests and dynamic-coverage documentation.
 
 ### Notes
 - Test-failure recall on LRTS is an observed failing-test proxy, not causal regression-fault recall.
 - Full LRTS replay still requires external dataset acquisition; the repository does not vendor the data.
 - Static impacted-test candidates are heuristic suggestions, not proof of coverage or fault detection.
-- Repository intelligence currently analyzes Python source only; dynamic coverage, multi-language support and runtime call graphs remain planned.
+- Coverage contexts are opaque labels; they must be configured per test. coverage.py JSON does not cryptographically attest the Git revision.
+- Repository intelligence currently analyzes Python source only; multi-language support, runtime call graphs, temporal snapshots and historical quality evaluation remain planned.
 - No adaptive ML predictor, agentic orchestration or production deployment is implemented.
 
 ## [0.1.0] - 2026-11-05

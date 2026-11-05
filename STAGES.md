@@ -34,21 +34,24 @@ This roadmap is evidence-driven. Later stages depend on measured results; dates 
 
 ## Stage 2 — Repository intelligence
 
-**Status:** Python static-impact slice implemented; multi-language and runtime evidence remain open.
+**Status:** Python static-impact analysis and per-test coverage graph implemented; multi-language and historical evidence remain open.
 
 - [x] Unified-diff file and line-change statistics parser.
 - [x] Safe Git base/head revision resolution and diff extraction.
 - [x] Python AST extraction without code execution.
 - [x] Absolute/relative Python import graph.
 - [x] Reverse dependency traversal for changed Python modules.
-- [x] Conservative impacted-test candidate report and CLI.
-- [x] Tests for malformed syntax, import cycles, path boundaries and Git failures.
+- [x] Conservative impacted-test candidate report.
+- [x] coverage.py JSON ingestion with per-line contexts.
+- [x] Test-to-source-file graph with executed line evidence.
+- [x] Changed-file lookup against observed test contexts.
 - [ ] Java/TypeScript and other language frontends.
-- [ ] Runtime call graph and dynamic coverage mapping.
-- [ ] Framework-aware test discovery and test-to-code coverage graph.
-- [ ] Temporal graph snapshots, evidence provenance and historical replay.
+- [ ] Runtime call graph extraction.
+- [ ] Temporal graph snapshots and feature provenance.
+- [ ] Framework-aware test discovery and execution adapters.
+- [!] Validate static/dynamic impact recall against real historical revisions and ground-truth outcomes.
 
-**Exit:** change and dependency features can be reconstructed for a historical revision without future evidence, with impact quality measured against runtime coverage or known test mappings.
+**Exit:** change and dependency features can be reconstructed for a historical revision without future evidence, with impact quality measured against runtime coverage or known test mappings. The coverage adapter is implemented; historical quality evaluation remains open.
 
 ## Stage 3 — Probabilistic evidence model
 
