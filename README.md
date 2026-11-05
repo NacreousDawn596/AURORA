@@ -78,11 +78,11 @@ Analyze a local repository revision range:
 
 Build a per-test coverage graph for a clean checkout:
 
-    coverage json --show-contexts -o coverage.json
+    coverage json --show-contexts -o /tmp/coverage.json
     aurora-benchmark map-coverage \
       --repo-path /path/to/project \
       --revision HEAD \
-      --coverage-json coverage.json \
+      --coverage-json /tmp/coverage.json \
       --changed-path src/package/service.py \
       --output coverage-graph.json
 

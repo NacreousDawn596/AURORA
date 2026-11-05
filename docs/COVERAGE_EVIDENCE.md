@@ -13,7 +13,7 @@ AURORA consumes coverage.py JSON with per-line contexts. Configure coverage.py t
 record a dynamic context for each test function (for example, by setting
 dynamic_context = test_function in the run configuration), run the tests, then export:
 
-    coverage json --show-contexts -o coverage.json
+    coverage json --show-contexts -o /tmp/coverage.json
 
 The report must have meta.show_contexts = true and each file must include
 executed_lines and a contexts mapping from line numbers to context labels.
@@ -32,7 +32,7 @@ coverage data:
     aurora-benchmark map-coverage \
       --repo-path /path/to/project \
       --revision HEAD \
-      --coverage-json coverage.json \
+      --coverage-json /tmp/coverage.json \
       --changed-path src/package/service.py \
       --output coverage-graph.json
 

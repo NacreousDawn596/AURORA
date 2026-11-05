@@ -32,14 +32,14 @@ The command does not require the external LRTS dataset.
 
 Configure coverage.py with per-test dynamic contexts, run your tests, and export contexts:
 
-    coverage json --show-contexts -o coverage.json
+    coverage json --show-contexts -o /tmp/coverage.json
 
 Then map the contexts to source lines at a clean checkout:
 
     aurora-benchmark map-coverage \
       --repo-path /path/to/project \
       --revision HEAD \
-      --coverage-json coverage.json \
+      --coverage-json /tmp/coverage.json \
       --changed-path src/package/service.py \
       --output results/coverage-graph.json
 
