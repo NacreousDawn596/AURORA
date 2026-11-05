@@ -1,7 +1,5 @@
 """Dependency-free unified-diff statistics for repository-intelligence baselines."""
 
-from __future__ import annotations
-
 import collections
 import dataclasses
 import pathlib
