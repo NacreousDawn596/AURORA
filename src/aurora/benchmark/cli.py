@@ -71,7 +71,9 @@ def build_parser() -> argparse.ArgumentParser:
         help="Build a per-test source-line graph from coverage.py JSON contexts",
     )
     coverage.add_argument("--repo-path", required=True, help="Path to a local Git repository")
-    coverage.add_argument("--revision", required=True, help="Git revision used for the coverage run")
+    coverage.add_argument(
+        "--revision", required=True, help="Git revision used for the coverage run"
+    )
     coverage.add_argument("--coverage-json", required=True, help="coverage.py JSON report path")
     coverage.add_argument(
         "--changed-path",
