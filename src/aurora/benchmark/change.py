@@ -2,16 +2,16 @@
 
 from __future__ import annotations
 
+import collections
+import dataclasses
+import pathlib
 import re
-from collections import Counter
-from dataclasses import dataclass
-from pathlib import PurePosixPath
 
 
 _DIFF_HEADER = re.compile(r"^diff --git a/(.+) b/(.+)$")
 
 
-@dataclass(frozen=True, slots=True)
+@dataclasses.dataclass(frozen=True, slots=True)
 class ChangedFile:
     path: str
     old_path: str | None
@@ -20,7 +20,7 @@ class ChangedFile:
     is_binary: bool = False
 
 
-@dataclass(frozen=True, slots=True)
+@dataclasses.dataclass(frozen=True, slots=True)
 class ChangeSummary:
     files: tuple[ChangedFile, ...]
 
@@ -46,9 +46,9 @@ class ChangeSummary:
 
     @property
     def extension_counts(self) -> dict[str, int]:
-        counts: Counter[str] = Counter()
+        counts: collections.Counter[str] = collections.Counter()
         for item in self.files:
-            suffix = PurePosixPath(item.path).suffix.lower() or "<none>"
+            suffix = pathlib.PurePosixPath(item.path).suffix.lower() or "<none>"
             counts[suffix] += 1
         return dict(sorted(counts.items()))
 
