@@ -25,7 +25,10 @@ jobs:
           cache: pip
       - run: python -m pip install --upgrade pip
       - run: python -m pip install -e '.[dev]'
-      - name: Preview Ruff canonical fixes\n        run: |\n          ruff check . --fix\n          git diff -- src/aurora/benchmark/change.py\n      - run: ruff check .
+      - name: Preview Ruff canonical fixes
+        run: |
+          ruff check . --fix
+          git diff -- src/aurora/benchmark/change.py\n      - run: ruff check .
       - run: ruff format --check .
       - run: mypy
       - run: aurora-benchmark --help
