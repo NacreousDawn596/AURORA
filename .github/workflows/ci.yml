@@ -28,7 +28,9 @@ jobs:
       - name: Preview Ruff canonical fixes
         run: |
           ruff check . --fix
-          git diff -- src/aurora/benchmark/change.py\n      - run: ruff check .
+          ruff format .
+          git diff -- .
+      - run: ruff check .
       - run: ruff format --check .
       - run: mypy
       - run: aurora-benchmark --help
