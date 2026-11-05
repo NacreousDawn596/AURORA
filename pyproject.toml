@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aurora-devops"
-version = "0.1.0"
+version = "0.2.0"
 description = "Research-first, evidence-aware adaptive test orchestration for CI/CD."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -17,6 +17,7 @@ dev = ["pytest>=8.0", "pytest-cov>=5.0", "ruff>=0.6", "mypy>=1.11"]
 
 [project.scripts]
 aurora-demo = "aurora.cli:main"
+aurora-benchmark = "aurora.benchmark.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

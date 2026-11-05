@@ -14,6 +14,32 @@ AURORA investigates how a pipeline can use project-specific evidence and a propo
 
 Determine whether **evidence-calibrated, interaction-aware adaptive test orchestration** can improve regression detection under constrained execution budgets while maintaining reliable failure attribution and safe release decisions.
 
+## Current scientific focus
+
+The proposed research focuses on:
+1. cause-aware outcome attribution under uncertain environments;
+2. conditional marginal diagnostic value with correlated test coverage;
+3. sequential evidence updates under runtime/resource budgets;
+4. test-order and shared-resource interaction constraints;
+5. release-safety policies that do not treat model confidence as proof.
+
+Test prioritization, historical prediction, change-impact analysis, graph selection, calibration and agentic orchestration all have prior work. Their combination is not claimed as novel without a structured related-work comparison and empirical validation.
+
+## Current implementation status
+
+The repository now contains:
+- a normalized immutable build/test execution schema;
+- an LRTS processed-dataset reader for metadata CSV and per-stage test-class ZIP archives;
+- UTC timestamp parsing and prior-only history feature derivation;
+- project-wise chronological train/validation/test splitting with timestamp ties kept together;
+- deterministic input, random, fastest-first, recent-failure-first, coverage-first and change-impact-first strategies;
+- fixed-budget offline replay and initial metrics;
+- SHA-256 metadata manifests and an LRTS CLI;
+- a basic unified-diff statistics parser;
+- unit tests and CI/container validation.
+
+The LRTS adapter has not yet been run against the full external dataset in this repository. Historical test-failure recall is a proxy, not causal regression-fault recall. No ML predictor, adaptive sequential policy, LLM agent or production deployment is implemented yet.
+
 ## Intended outcomes
 
 1. Reproducible benchmark and experiment harness.
@@ -68,8 +94,4 @@ Production deployment remains approval-gated during research. No autonomy level 
 
 ## Success criteria
 
-Report regression recall at fixed compute budgets, APFDc, time to first confirmed regression, probability calibration, failure attribution, order-induced failures, compute overhead, false release blocks, escaped regressions, human interventions and agentic errors. Thresholds must be preregistered; no target is presented as an achieved result.
-
-## Current status
-
-The repository is at the research-foundation stage. The first implementation is a small Python package and transparent greedy scheduling baseline. It establishes development conventions before dataset ingestion and model training.
+Report regression recall at fixed compute budgets, APFDc where known fault labels exist, time to first confirmed regression, probability calibration, failure attribution, order-induced failures, compute overhead, false release blocks, escaped regressions, human interventions and agentic errors. Thresholds must be preregistered; no target is presented as an achieved result.

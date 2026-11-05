@@ -4,6 +4,12 @@
 
 Define a fair and reproducible evaluation. Record final split boundaries, exclusions, metrics and statistical tests before inspecting final test-set outcomes.
 
+## Dataset provenance and granularity
+
+The first adapter targets the processed LRTS artifact. See DATASETS.md for the expected folder structure and acquisition guidance. The adapter preserves LRTS test-class-within-build-stage granularity; do not report class-level results as method-level results.
+
+The processed LRTS test-class records provide observed outcomes and durations. A failed test is not automatically a regression attributable to the current change. LRTS replay therefore reports test-failure recall as a proxy. Distinct fault recall and APFDc require external, independently established fault IDs.
+
 ## Experimental units
 
 Distinguish project, commit/build, test class or method (preserving source dataset granularity), execution, known defect scenario and pipeline run. Correlated executions within one project are not independent projects.
@@ -18,6 +24,7 @@ Distinguish project, commit/build, test class or method (preserving source datas
 ## Leakage prevention
 
 - Split chronologically within each project.
+- Keep records with equal timestamps in the same partition.
 - Use only history preceding the evaluated revision.
 - Fit transforms, calibration and thresholds on training/validation only.
 - Evaluate on untouched future revisions.
@@ -29,17 +36,25 @@ Distinguish project, commit/build, test class or method (preserving source datas
 
 For each held-out revision: resolve source and parent; reconstruct prior evidence; identify candidates and mandatory tests; initialize budget; select next test; reveal only the selected result; update scheduler state; continue until budget/policy stop; compute fault detection, cost and reliability metrics.
 
-Historical replay does not fully model order-dependent or resource-contention effects. Validate policies using live controlled execution.
+Current offline replay orders tests using prior metadata and simulates the observed full-run outcomes. It is not a live execution engine and does not model every order-dependent or resource-contention effect. Validate policies using live controlled execution.
 
 ## Baselines
 
-Full suite, random, fastest-first, recently-failed-first, coverage, change-impact, reproducible recent publications and simple supervised models. All use equivalent candidate sets, evidence, budgets and environment assumptions.
+Full suite, input order, seeded random, fastest-first, recent-failure-first, coverage, change-impact, reproducible recent publications and simple supervised models. All use equivalent candidate sets, evidence, budgets and environment assumptions. AURORA's simple baselines are not claimed to reproduce DANTE.
 
 ## Metrics
 
-Primary: distinct known-fault recall at 10/25/50/75% full-suite cost, APFDc and time to first confirmed regression.
+Primary:
+- distinct known-fault recall at 10/25/50/75% full-suite cost where ground-truth fault IDs exist;
+- test-failure recall at budget for historical datasets without causal fault labels (reported separately);
+- APFDc only with explicit known fault IDs;
+- time to first observed failing test, clearly distinguished from first confirmed regression.
 
-Secondary: Brier, log loss, ECE, per-class precision/recall, macro-F1, confusion matrix, wall time, CPU, memory, scheduler overhead, order-induced failure rate, false release blocks, escaped regressions, interventions and tool errors.
+Secondary:
+- Brier, log loss, ECE, per-class precision/recall, macro-F1 and confusion matrix;
+- wall time, CPU, memory, scheduler overhead;
+- order-induced failure rate;
+- false release blocks, escaped regressions, interventions and tool errors.
 
 ## Ablations
 
@@ -51,7 +66,7 @@ Use paired per-commit comparisons, aggregate by project, report effect sizes and
 
 ## Reproducibility manifest
 
-Record dataset/version/license/checksum; project/revision; split boundaries; code commit; model/calibration versions; seeds; environment and image digests; scheduler configuration and budgets; raw result references; metric implementation version.
+Record dataset/version/license/checksum; project/revision; split boundaries; code commit; model/calibration versions; seeds; environment and image digests; scheduler configuration and budgets; raw result references; metric implementation version. The initial manifest checksums the metadata CSV, not every referenced ZIP; archive a complete dataset checksum separately.
 
 ## Reporting
 

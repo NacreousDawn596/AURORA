@@ -6,21 +6,24 @@ AURORA is both a software project and a research artifact. Contributions must pr
 
 Requires Python 3.11+.
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install -e '.[dev]'
-pytest
-```
+    python -m venv .venv
+    source .venv/bin/activate
+    python -m pip install -e ".[dev]"
+    pytest
 
 ## Quality checks
 
-```bash
-ruff check .
-ruff format --check .
-mypy
-pytest
-```
+    ruff check .
+    ruff format --check .
+    mypy
+    pytest --cov=aurora --cov-report=term-missing
+    aurora-benchmark --help
+
+## Working with LRTS
+
+Do not commit downloaded research datasets. Follow docs/DATASETS.md, keep the exact dataset version and license/provenance notes, and store result artifacts outside source control unless they are small and explicitly approved.
+
+Use strict ingestion by default. If you use permissive mode, preserve the skipped-record report in the experiment output.
 
 ## Guidelines
 
