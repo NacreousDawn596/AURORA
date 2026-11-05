@@ -29,7 +29,10 @@ jobs:
         run: |
           ruff check . --fix
           ruff format .
-          git diff -- .
+          for path in $(git diff --name-only); do
+            printf 'AURORA_FILE:%s\n' "$path"
+            python -c 'import json, pathlib, sys; print(json.dumps(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8")))' "$path"
+          done
       - run: ruff check .
       - run: ruff format --check .
       - run: mypy
