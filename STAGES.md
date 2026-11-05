@@ -34,16 +34,21 @@ This roadmap is evidence-driven. Later stages depend on measured results; dates 
 
 ## Stage 2 — Repository intelligence
 
-**Status:** First primitive implemented.
+**Status:** Python static-impact slice implemented; multi-language and runtime evidence remain open.
 
 - [x] Unified-diff file and line-change statistics parser.
-- [ ] Git diff and commit metadata ingestion.
-- [ ] Test discovery and framework metadata.
-- [ ] Static dependency/call graph.
-- [ ] Dynamic coverage mapping.
-- [ ] Temporal graph snapshots and feature provenance.
+- [x] Safe Git base/head revision resolution and diff extraction.
+- [x] Python AST extraction without code execution.
+- [x] Absolute/relative Python import graph.
+- [x] Reverse dependency traversal for changed Python modules.
+- [x] Conservative impacted-test candidate report and CLI.
+- [x] Tests for malformed syntax, import cycles, path boundaries and Git failures.
+- [ ] Java/TypeScript and other language frontends.
+- [ ] Runtime call graph and dynamic coverage mapping.
+- [ ] Framework-aware test discovery and test-to-code coverage graph.
+- [ ] Temporal graph snapshots, evidence provenance and historical replay.
 
-**Exit:** features can be reconstructed for a historical revision without future information.
+**Exit:** change and dependency features can be reconstructed for a historical revision without future evidence, with impact quality measured against runtime coverage or known test mappings.
 
 ## Stage 3 — Probabilistic evidence model
 

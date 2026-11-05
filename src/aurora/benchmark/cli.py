@@ -1,4 +1,4 @@
-"""Command-line interface for LRTS inspection and baseline replay."""
+"""Command-line interface for LRTS inspection, replay and repository analysis."""
 
 from __future__ import annotations
 
@@ -14,6 +14,7 @@ from aurora.benchmark.manifest import ExperimentManifest, write_manifest
 from aurora.benchmark.replay import replay
 from aurora.benchmark.schema import BuildRun
 from aurora.benchmark.strategies import Strategy
+from aurora.repository.analysis import analyze_repository
 
 
 def _add_dataset_arguments(parser: argparse.ArgumentParser) -> None:
@@ -50,6 +51,18 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--seed", type=int, default=0)
     run.add_argument("--output", default="-", help="JSON output path, or - for stdout")
     run.add_argument("--manifest", help="Optional path for a reproducibility manifest")
+
+    analyze = commands.add_parser(
+        "analyze-repo",
+        help="Analyze Git changes and identify candidate impacted Python tests",
+    )
+    analyze.add_argument("--repo-path", required=True, help="Path to a local Git repository")
+    analyze.add_argument("--base", required=True, help="Base Git revision")
+    analyze.add_argument("--head", required=True, help="Head Git revision")
+    analyze.add_argument("--timeout-seconds", type=float, default=30.0)
+    analyze.add_argument("--max-files", type=int, default=10_000)
+    analyze.add_argument("--max-file-bytes", type=int, default=1_000_000)
+    analyze.add_argument("--output", default="-", help="JSON output path, or - for stdout")
     return parser
 
 
@@ -83,6 +96,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     try:
+        if args.command == "analyze-repo":
+            report = analyze_repository(
+                args.repo_path,
+                args.base,
+                args.head,
+                timeout_seconds=args.timeout_seconds,
+                max_files=args.max_files,
+                max_file_bytes=args.max_file_bytes,
+            )
+            _write_json(report.to_dict(), args.output)
+            return 0
+
         runs, skipped = _load_runs(args)
         if args.command == "inspect-lrts":
             projects = sorted({item.build.project for item in runs})
@@ -159,7 +184,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             )
             write_manifest(manifest, args.manifest)
         return 0
-    except (OSError, ValueError) as exc:
+    except (OSError, ValueError, RuntimeError) as exc:
         parser.error(str(exc))
     return 2
 

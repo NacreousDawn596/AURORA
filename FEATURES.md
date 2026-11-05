@@ -27,13 +27,20 @@ Legend: [x] implemented; [~] partial/scaffolded; [ ] planned; [!] requires resea
 ## Stage 2 — Repository intelligence
 
 - [x] Unified-diff file/addition/deletion statistics parser.
-- [ ] Git commit and diff ingestion from repositories.
-- [ ] AST parsing adapters.
-- [ ] Static dependency and call graph extraction.
+- [x] Safe Git revision resolution and diff ingestion.
+- [x] Python AST import, function/class/method and call-expression extraction (no execution).
+- [x] Python import graph with absolute and relative import resolution.
+- [x] Reverse dependency traversal and impacted Python path enumeration.
+- [x] Conservative candidate-test report.
+- [x] `analyze-repo` JSON CLI.
+- [x] Tests for Git refs, repo paths with spaces, AST syntax errors, relative imports, cycles, transitive impact and path limits.
+- [ ] Java/TypeScript and other language frontends.
 - [ ] Dynamic coverage ingestion.
 - [ ] Test-to-code coverage graph.
-- [ ] Temporal graph snapshots.
-- [ ] Evidence provenance and replay.
+- [ ] Runtime call graph extraction.
+- [ ] Temporal graph snapshots and feature provenance.
+- [ ] Framework-aware test discovery and execution adapters.
+- [!] Validate static impact recall against real historical revisions and ground-truth test coverage.
 
 ## Stage 3 — Probabilistic evidence model
 

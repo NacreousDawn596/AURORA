@@ -28,14 +28,23 @@ The proposed research contribution is evidence-calibrated, interaction-aware ada
 - Budget-constrained offline replay.
 - Test-failure recall, distinct known-fault recall, APFDc and time-to-first-failure metrics.
 - Reproducibility manifests with metadata SHA-256.
-- Unified-diff file/addition/deletion statistics.
 
-The LRTS adapter does not invent causal regression labels. Historical failing-test recall is reported as a proxy, not regression-fault recall.
+Historical LRTS failing-test recall is an observed test-failure proxy, not causal regression-fault recall.
+
+### Repository intelligence (Python-first)
+
+- Safe local Git revision resolution and unified-diff extraction.
+- Non-executing Python AST extraction for imports, symbols and call expressions.
+- Static Python import/dependency graph, including relative imports.
+- Reverse dependency traversal to propose impacted Python test candidates.
+- JSON report through `aurora-benchmark analyze-repo`.
+
+This is conservative static analysis, not runtime coverage, a complete call graph or proof that a candidate test will detect a fault. It currently analyzes Python source only.
 
 ### Engineering foundation
 
 - Python package and command-line tools.
-- Unit tests for validation, ingestion, history, splitting, ordering, replay, metrics, manifests and diff parsing.
+- Granular tests for ingestion, history, splitting, ordering, replay, metrics, manifests, diff parsing, Git comparison, AST extraction, dependency resolution and CLI behavior.
 - GitHub Actions CI on every push and pull request.
 - OCI container build and smoke validation.
 
@@ -59,11 +68,23 @@ Run the scheduler demo:
 python -m aurora
 ```
 
-Run the benchmark CLI:
+Inspect benchmark commands:
 
 ```bash
 aurora-benchmark --help
 ```
+
+Analyze a local repository revision range:
+
+```bash
+aurora-benchmark analyze-repo \
+  --repo-path /path/to/project \
+  --base main \
+  --head HEAD \
+  --output aurora-impact.json
+```
+
+The report includes changed files, additions/deletions, parsed Python module count, dependency edge count, impacted Python paths, candidate test paths and static-analysis limitations. The repository must be checked out at the requested `--head` with a clean worktree; ignored untracked Python files are rejected too. The analyzer does not execute repository code or run tests.
 
 ## LRTS dataset
 
@@ -77,6 +98,7 @@ AURORA does not vendor the external dataset. Follow [docs/DATASETS.md](docs/DATA
 - [Changelog](CHANGELOG.md)
 - [Research plan](docs/RESEARCH.md)
 - [Architecture](docs/ARCHITECTURE.md)
+- [Repository intelligence](docs/REPOSITORY_INTELLIGENCE.md)
 - [Experiment protocol](docs/EXPERIMENTS.md)
 - [Benchmark strategies and metrics](docs/BENCHMARKS.md)
 - [Dataset acquisition](docs/DATASETS.md)

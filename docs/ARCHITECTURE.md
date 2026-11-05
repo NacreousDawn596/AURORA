@@ -42,7 +42,9 @@ Agents request operations through typed interfaces. They do not receive unrestri
 
 ## Current implementation modules
 
-The first experimental workbench is implemented under src/aurora/benchmark/:
+### Benchmark workbench
+
+Implemented under src/aurora/benchmark/:
 
 | Module | Responsibility |
 |---|---|
@@ -53,10 +55,23 @@ The first experimental workbench is implemented under src/aurora/benchmark/:
 | metrics.py | Budget-aware test-failure and known-fault metrics |
 | replay.py | Offline fixed-budget strategy replay |
 | manifest.py | Dataset metadata checksum and reproducibility manifest |
-| cli.py | Dataset inspection and replay commands |
-| change.py | Initial unified-diff file/line statistics |
+| cli.py | Dataset inspection, replay and repository analysis commands |
+| change.py | Unified-diff file and line statistics |
 
-The change.py module is a statistics parser, not an AST parser or semantic dependency analyzer.
+### Repository intelligence
+
+Implemented under src/aurora/repository/:
+
+| Module | Responsibility |
+|---|---|
+| git.py | Resolve base/head refs to commit IDs and extract safe Git diffs |
+| python_ast.py | Parse Python source without execution; extract imports, symbols and call expressions |
+| dependency.py | Scan Python files, resolve static imports and build importer-to-dependency edges |
+| analysis.py | Combine Git changes and Python dependency evidence into a candidate-test report |
+
+The initial analyzer understands standard src/ layouts and ordinary Python packages. It skips common generated/vendor directories, ignores symlinked Python files, applies file-count and file-size limits, reports parse/scan issues, and handles cycles during reverse dependency traversal.
+
+This is not a full semantic analyzer. It does not execute code, infer dynamic imports, derive runtime coverage, guarantee test reachability or prove that a candidate test detects a fault. It currently analyzes Python source only.
 
 ## Target data flow
 
@@ -97,4 +112,4 @@ A scheduling decision has candidate set, selected test/batch, score components, 
 
 ## Implementation status
 
-The repository currently has the Stage 1 experimental workbench and a first Stage 2 diff-statistics primitive. Predictive ML, a graph store, adaptive sequential scheduling, agentic orchestration and production deployment remain planned.
+The repository contains the Stage 1 experimental workbench and an initial Python static repository-intelligence layer. Predictive ML, dynamic coverage, multi-language analysis, adaptive sequential scheduling, agentic orchestration and production deployment remain planned.
