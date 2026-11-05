@@ -145,9 +145,7 @@ def load_coverage_graph(
     except OSError as exc:
         raise CoverageReportError(f"could not read coverage report: {exc}") from exc
     if len(raw_bytes) > max_report_bytes:
-        raise CoverageReportError(
-            f"coverage report exceeds the {max_report_bytes}-byte size limit"
-        )
+        raise CoverageReportError(f"coverage report exceeds the {max_report_bytes}-byte size limit")
     try:
         payload: Any = json.loads(raw_bytes.decode("utf-8"))
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
