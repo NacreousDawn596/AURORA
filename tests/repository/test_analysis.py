@@ -22,13 +22,16 @@ def _init_project(repo: Path) -> tuple[str, str]:
     _git(repo, "init", "-b", "main")
     _git(repo, "config", "user.name", "AURORA tests")
     _git(repo, "config", "user.email", "aurora-tests@example.invalid")
-    test_source = "\n".join(
-        (
-            "from app.service import VALUE",
-            "def test_value():",
-            "    assert VALUE",
+    test_source = (
+        "\n".join(
+            (
+                "from app.service import VALUE",
+                "def test_value():",
+                "    assert VALUE",
+            )
         )
-    ) + "\n"
+        + "\n"
+    )
     files = {
         "src/app/core.py": "VALUE = 1\n",
         "src/app/service.py": "from app.core import VALUE\n",
