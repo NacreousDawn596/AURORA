@@ -28,6 +28,7 @@ jobs:
       - run: ruff check .
       - run: ruff format --check .
       - run: mypy
+      - run: aurora-benchmark --help
 
   tests:
     name: Unit tests (Python ${{ matrix.python-version }})

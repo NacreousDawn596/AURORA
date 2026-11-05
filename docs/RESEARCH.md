@@ -40,9 +40,15 @@ The marginal value of test t is `DeltaU(t | S) = U(S) - U(S union {t})`. This ap
 
 A sequential policy chooses tests using marginal risk reduction, information gain, uncertainty, execution time, resource cost and interference risk, subject to budgets and mandatory-test constraints.
 
+## Current experimental workbench
+
+AURORA currently implements a normalized LRTS test-class/build-stage reader, prior-only historical failure-age derivation, per-project chronological splits, deterministic ordering baselines, fixed-budget replay and initial metrics. It also has a basic unified-diff statistics parser. These are research infrastructure; no predictor or adaptive policy is implemented yet.
+
+LRTS outcomes are observations, not causal fault labels. Historical test-failure recall is a proxy. Fault recall and APFDc require independently known fault IDs.
+
 ## Labeling and attribution
 
-A failed test is not automatically a regression. Candidate classes: regression introduced by current change; flaky/nondeterministic failure; infrastructure/environment failure; pre-existing or unrelated deterministic failure; pass. Ground truth should use controlled parent/revision comparisons, reproducible reruns, environment health evidence, known defect triggers and independent adjudication. Ambiguous cases remain `unknown`.
+A failed test is not automatically a regression. Candidate classes: regression introduced by current change; flaky/nondeterministic failure; infrastructure/environment failure; pre-existing or unrelated deterministic failure; pass. Ground truth should use controlled parent/revision comparisons, reproducible reruns, environment health evidence, known defect triggers and independent adjudication. Ambiguous cases remain unknown.
 
 ## Evaluation tracks
 
@@ -54,12 +60,14 @@ A failed test is not automatically a regression. Candidate classes: regression i
 
 ## Baselines
 
-Full suite, random, fastest-first, recently-failed-first, coverage-based, change-impact-based, published recent methods where reproducible, simple supervised classifiers and AURORA ablations. Methods must receive equivalent evidence and budgets.
+Full suite, input order, random, fastest-first, recently-failed-first, coverage-based, change-impact-based, published recent methods where reproducible, simple supervised classifiers and AURORA ablations. Methods must receive equivalent evidence and budgets.
 
 ## Metrics
 
-- Distinct known-fault recall at 10%, 25%, 50% and 75% of full-suite cost.
-- APFDc and time to first confirmed regression.
+- Distinct known-fault recall at 10%, 25%, 50% and 75% of full-suite cost where fault labels exist.
+- Observed test-failure recall at budget as a separate historical proxy.
+- APFDc only when external fault IDs exist.
+- Time to first observed failure and, separately, time to first confirmed regression.
 - Brier score, log loss, ECE and calibration curves.
 - Per-class precision/recall, macro-F1 and confusion matrix.
 - Order-induced/flaky failure rate.
@@ -68,7 +76,7 @@ Full suite, random, fastest-first, recently-failed-first, coverage-based, change
 
 ## Validity controls
 
-Chronological and rolling-origin splits; leave-one-project-out generalization; cold-start evaluation; feature timestamps/provenance; no future graph, coverage or failure information; project-clustered confidence intervals; multiple-comparison correction; preregistered hypotheses and metrics; report negative results.
+Chronological and rolling-origin splits; equal timestamps kept together; leave-one-project-out generalization; cold-start evaluation; feature timestamps/provenance; no future graph, coverage or failure information; project-clustered confidence intervals; multiple-comparison correction; preregistered hypotheses and metrics; report negative results.
 
 ## Novelty gate
 

@@ -40,7 +40,40 @@ Agents request operations through typed interfaces. They do not receive unrestri
 - Policy decisions and approval records.
 - Logs, metrics and traces.
 
-## Data flow
+## Current implementation modules
+
+### Benchmark workbench
+
+Implemented under src/aurora/benchmark/:
+
+| Module | Responsibility |
+|---|---|
+| schema.py | Immutable normalized build and test-execution records |
+| lrts.py | LRTS metadata/ZIP ingestion, outcome normalization and prior-only history features |
+| splits.py | Per-project chronological partitions with equal timestamps held together |
+| strategies.py | Deterministic ordering baselines |
+| metrics.py | Budget-aware test-failure and known-fault metrics |
+| replay.py | Offline fixed-budget strategy replay |
+| manifest.py | Dataset metadata checksum and reproducibility manifest |
+| cli.py | Dataset inspection, replay and repository analysis commands |
+| change.py | Unified-diff file and line statistics |
+
+### Repository intelligence
+
+Implemented under src/aurora/repository/:
+
+| Module | Responsibility |
+|---|---|
+| git.py | Resolve base/head refs to commit IDs and extract safe Git diffs |
+| python_ast.py | Parse Python source without execution; extract imports, symbols and call expressions |
+| dependency.py | Scan Python files, resolve static imports and build importer-to-dependency edges |
+| analysis.py | Combine Git changes and Python dependency evidence into a candidate-test report |
+
+The initial analyzer understands standard src/ layouts and ordinary Python packages. It skips common generated/vendor directories, ignores symlinked Python files, applies file-count and file-size limits, reports parse/scan issues, and handles cycles during reverse dependency traversal.
+
+This is not a full semantic analyzer. It does not execute code, infer dynamic imports, derive runtime coverage, guarantee test reachability or prove that a candidate test detects a fault. It currently analyzes Python source only.
+
+## Target data flow
 
 1. Receive a commit or pull-request revision.
 2. Resolve the exact source revision and build context.
@@ -55,7 +88,7 @@ Agents request operations through typed interfaces. They do not receive unrestri
 11. Apply security and release policies.
 12. Store immutable artifacts and auditable decision traces.
 
-## Contracts
+## Data contracts
 
 A test candidate has a stable ID, framework, target revision, duration/resource estimates, impact/coverage evidence, interaction constraints and mandatory status.
 
@@ -79,4 +112,4 @@ A scheduling decision has candidate set, selected test/batch, score components, 
 
 ## Implementation status
 
-The initial repository contains a small Python scheduling baseline only. This architecture is the target design, not a claim that all components exist.
+The repository contains the Stage 1 experimental workbench and an initial Python static repository-intelligence layer. Predictive ML, dynamic coverage, multi-language analysis, adaptive sequential scheduling, agentic orchestration and production deployment remain planned.

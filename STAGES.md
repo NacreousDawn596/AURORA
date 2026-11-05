@@ -2,67 +2,83 @@
 
 This roadmap is evidence-driven. Later stages depend on measured results; dates are not commitments.
 
-## Stage 0 — Research foundation (in progress)
+## Stage 0 — Research foundation
+
+**Status:** Complete as a repository foundation; related-work and preregistration work remain ongoing.
 
 - [x] Establish identity, scope and research questions.
 - [x] Establish documentation, Python package, baseline tests and CI.
+- [x] Record architecture, experiment protocol and security principles.
 - [ ] Complete verified related-work matrix.
-- [ ] Record dataset versions, licenses and access constraints.
-- [ ] Preregister evaluation protocol and leakage controls.
+- [ ] Finalize dataset provenance and preregistered protocol.
 
-**Exit:** reproducible baseline plan, data provenance and agreed protocol.
+## Stage 1 — Experimental workbench
 
-## Stage 1 — Experimental workbench (next)
+**Status:** Implementation substantially complete; external-data evaluation remains open.
 
-- [ ] Dataset ingestion interfaces and normalized schema.
-- [ ] LRTS historical CI adapter.
-- [ ] Temporal train/validation/test splits.
-- [ ] Random, fastest-first, recent-failure-first, coverage and change-impact baselines.
-- [ ] Replay engine with fixed compute budgets.
-- [ ] Metrics: recall@budget, APFDc, TTFR and cost.
-- [ ] Reproducible run manifests and result artifacts.
+- [x] Dataset ingestion interface and normalized schema.
+- [x] LRTS metadata and test-class ZIP adapter.
+- [x] UTC timestamp parsing and validation.
+- [x] Prior-only history features.
+- [x] Per-project chronological splits and timestamp-tie protection.
+- [x] Basic ordering baselines.
+- [x] Fixed-budget replay.
+- [x] Test-failure recall, known-fault recall, APFDc and TTFF metrics.
+- [x] Experiment manifest and data checksum.
+- [x] LRTS inspection and replay CLI.
+- [x] Unit tests for feature behavior and edge cases.
+- [ ] Run against the downloaded full LRTS artifact and archive actual experiment outputs.
+- [ ] Reproduce recent published baselines, including DANTE, under compatible conditions.
 
-**Exit:** baseline methods run under the same chronological evaluation harness.
+**Exit:** baseline methods run under the same chronological evaluation harness on the actual dataset, with a reproducible result bundle. The code is ready for that evaluation; the full-data exit criterion is not yet met because the external dataset is not stored in this repository.
 
 ## Stage 2 — Repository intelligence
 
-- [ ] Git diff and commit metadata extraction.
-- [ ] Test discovery and framework metadata.
-- [ ] Static dependency graph and dynamic coverage mapping.
-- [ ] Temporal graph snapshots and feature provenance.
+**Status:** Python static-impact slice implemented; multi-language and runtime evidence remain open.
 
-**Exit:** features can be reconstructed for a historical revision without future information.
+- [x] Unified-diff file and line-change statistics parser.
+- [x] Safe Git base/head revision resolution and diff extraction.
+- [x] Python AST extraction without code execution.
+- [x] Absolute/relative Python import graph.
+- [x] Reverse dependency traversal for changed Python modules.
+- [x] Conservative impacted-test candidate report and CLI.
+- [x] Tests for malformed syntax, import cycles, path boundaries and Git failures.
+- [ ] Java/TypeScript and other language frontends.
+- [ ] Runtime call graph and dynamic coverage mapping.
+- [ ] Framework-aware test discovery and test-to-code coverage graph.
+- [ ] Temporal graph snapshots, evidence provenance and historical replay.
+
+**Exit:** change and dependency features can be reconstructed for a historical revision without future evidence, with impact quality measured against runtime coverage or known test mappings.
 
 ## Stage 3 — Probabilistic evidence model
 
 - [ ] Define outcome labels and adjudication protocol.
-- [ ] Establish regression/flaky/infrastructure/unrelated/pass data.
+- [ ] Establish regression/flaky/infrastructure/unrelated/pass datasets.
 - [ ] Train interpretable baseline models.
 - [ ] Add graph and change features.
 - [ ] Evaluate calibration and per-class metrics.
 - [ ] Evaluate cold-start and cross-project behavior.
 
-**Exit:** predictive value and calibration measured against simple baselines.
+**Exit:** predictive value and calibration are measured against simple baselines.
 
 ## Stage 4 — Adaptive and interaction-aware scheduler
 
-- [ ] Marginal diagnostic-value estimation.
+- [ ] Conditional marginal diagnostic-value estimation.
 - [ ] Sequential evidence updates.
 - [ ] Runtime/resource budgets.
 - [ ] Test interaction graph and concurrency constraints.
 - [ ] Greedy, contextual-bandit and sequential policy comparisons.
 - [ ] Order-dependence and ablation experiments.
 
-**Exit:** gains, overhead and order-related effects measured on held-out data.
+**Exit:** gains, overhead and order-related effects are measured on held-out data.
 
 ## Stage 5 — Containerized CI platform
 
+- [x] Container image build and smoke validation in CI.
 - [ ] OCI build/execution workers and isolation.
 - [ ] pytest, JUnit and Vitest adapters.
 - [ ] Structured execution evidence and image digests.
 - [ ] CI provider integration, security checks and SBOM.
-
-**Exit:** reproducible build/test runs with complete evidence records.
 
 ## Stage 6 — Bounded agentic orchestration
 
@@ -72,8 +88,6 @@ This roadmap is evidence-driven. Later stages depend on measured results; dates 
 - [ ] L0/L1/L2/L3 autonomy experiments.
 - [ ] Staging, monitoring and controlled rollback.
 
-**Exit:** autonomy comparison reports tool errors, policy violations, interventions and recovery.
-
 ## Stage 7 — Evaluation and publication
 
 - [ ] Historical CI replay, real defect benchmarks and controlled fault injection.
@@ -81,8 +95,6 @@ This roadmap is evidence-driven. Later stages depend on measured results; dates 
 - [ ] Temporal and leave-one-project-out evaluation.
 - [ ] Ablations and statistical analysis.
 - [ ] Reproducible artifact release and paper submission, contingent on results.
-
-**Exit:** every paper claim is directly supported by reproducible results.
 
 ## Change control
 
