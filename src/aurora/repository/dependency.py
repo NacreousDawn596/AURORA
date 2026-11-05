@@ -14,7 +14,6 @@ from aurora.repository.python_ast import (
     module_name_from_path,
 )
 
-
 DEFAULT_IGNORED_DIRECTORIES = frozenset(
     {
         ".git",
@@ -89,8 +88,7 @@ def _python_files(
         directories[:] = sorted(
             name
             for name in directories
-            if name not in DEFAULT_IGNORED_DIRECTORIES
-            and not (Path(current) / name).is_symlink()
+            if name not in DEFAULT_IGNORED_DIRECTORIES and not (Path(current) / name).is_symlink()
         )
         for filename in sorted(filenames):
             if not filename.endswith(".py"):
@@ -205,9 +203,7 @@ def build_python_graph(
     if max_files < 1 or max_file_bytes < 1:
         raise ValueError("max_files and max_file_bytes must be positive")
 
-    paths, scan_warnings = _python_files(
-        root, max_files=max_files, max_file_bytes=max_file_bytes
-    )
+    paths, scan_warnings = _python_files(root, max_files=max_files, max_file_bytes=max_file_bytes)
     module_to_path, path_to_module = _module_index(paths)
     modules: list[PythonModuleAnalysis] = []
     syntax_errors: list[str] = []
@@ -324,9 +320,7 @@ def compute_test_impact(
     impacted_test_paths.update(changed_test_paths)
 
     if impacted:
-        rationale.append(
-            "Python importers were followed transitively from changed Python modules."
-        )
+        rationale.append("Python importers were followed transitively from changed Python modules.")
     if changed_test_paths:
         rationale.append("Changed test files are included directly.")
     if graph.syntax_errors:
@@ -335,12 +329,11 @@ def compute_test_impact(
         )
     if graph.scan_warnings:
         rationale.append(
-            "One or more Python files were skipped during scanning; static impact may be incomplete."
+            "One or more Python files were skipped during scanning; "
+            "static impact may be incomplete."
         )
     if not impacted_test_paths:
-        rationale.append(
-            "No test candidate was identified by the available Python import graph."
-        )
+        rationale.append("No test candidate was identified by the available Python import graph.")
 
     return ImpactResult(
         changed_paths=tuple(sorted(normalized_changed)),

@@ -42,17 +42,20 @@ def test_analyze_repo_cli_writes_json_summary(
 ) -> None:
     repo = tmp_path / "project"
     base, head = _repo(repo)
-    assert main(
-        [
-            "analyze-repo",
-            "--repo-path",
-            str(repo),
-            "--base",
-            base,
-            "--head",
-            head,
-        ]
-    ) == 0
+    assert (
+        main(
+            [
+                "analyze-repo",
+                "--repo-path",
+                str(repo),
+                "--base",
+                base,
+                "--head",
+                head,
+            ]
+        )
+        == 0
+    )
     payload = json.loads(capsys.readouterr().out)
     assert payload["changed_file_count"] == 1
     assert payload["candidate_test_paths"] == ["tests/test_pkg.py"]
@@ -75,24 +78,28 @@ def test_analyze_repo_cli_rejects_bad_ref(tmp_path: Path) -> None:
         )
     assert error.value.code == 2
 
+
 def test_analyze_repo_cli_can_write_report_to_file(tmp_path: Path) -> None:
     repo = tmp_path / "project"
     base, head = _repo(repo)
     output = tmp_path / "reports" / "impact.json"
 
-    assert main(
-        [
-            "analyze-repo",
-            "--repo-path",
-            str(repo),
-            "--base",
-            base,
-            "--head",
-            head,
-            "--output",
-            str(output),
-        ]
-    ) == 0
+    assert (
+        main(
+            [
+                "analyze-repo",
+                "--repo-path",
+                str(repo),
+                "--base",
+                base,
+                "--head",
+                head,
+                "--output",
+                str(output),
+            ]
+        )
+        == 0
+    )
 
     payload = json.loads(output.read_text(encoding="utf-8"))
     assert payload["base_commit"] == base

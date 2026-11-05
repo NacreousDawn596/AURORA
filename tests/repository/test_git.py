@@ -11,7 +11,6 @@ from aurora.repository.git import (
     resolve_commit,
 )
 
-
 pytestmark = pytest.mark.skipif(shutil.which("git") is None, reason="Git is not installed")
 
 
@@ -88,12 +87,14 @@ def test_invalid_repository_path_is_rejected(tmp_path: Path) -> None:
     with pytest.raises(GitAnalysisError, match="not a directory"):
         resolve_commit(file_path, "HEAD")
 
+
 def test_invalid_timeout_is_rejected(tmp_path: Path) -> None:
     repo = tmp_path / "repo"
     _init_repo(repo)
     for timeout in (0, -1, float("inf"), float("nan")):
         with pytest.raises(GitAnalysisError, match="timeout_seconds"):
             resolve_commit(repo, "HEAD", timeout_seconds=timeout)
+
 
 def test_clean_head_requires_exact_revision_and_clean_worktree(tmp_path: Path) -> None:
     repo = tmp_path / "repo"
@@ -106,6 +107,7 @@ def test_clean_head_requires_exact_revision_and_clean_worktree(tmp_path: Path) -
     (repo / "src" / "module.py").write_text("VALUE = 99\n", encoding="utf-8")
     with pytest.raises(GitAnalysisError, match="not clean"):
         ensure_clean_head(repo, head)
+
 
 def test_clean_head_rejects_ignored_untracked_python_sources(tmp_path: Path) -> None:
     repo = tmp_path / "repo"

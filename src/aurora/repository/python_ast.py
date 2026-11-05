@@ -92,8 +92,10 @@ def _collect_symbols(
             symbols.extend(_collect_symbols(node.body, parent=qualified))
         elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             qualified = (*parent, node.name)
-            kind = "method" if parent else (
-                "async_function" if isinstance(node, ast.AsyncFunctionDef) else "function"
+            kind = (
+                "method"
+                if parent
+                else ("async_function" if isinstance(node, ast.AsyncFunctionDef) else "function")
             )
             if parent and isinstance(node, ast.AsyncFunctionDef):
                 kind = "async_method"
@@ -171,6 +173,8 @@ def analyze_python_source(
         path=path_text,
         module_name=resolved_module_name,
         imports=tuple(sorted(visitor.imports, key=lambda item: (item.line, item.module or ""))),
-        symbols=tuple(sorted(_collect_symbols(tree.body), key=lambda item: (item.line, item.qualified_name))),
+        symbols=tuple(
+            sorted(_collect_symbols(tree.body), key=lambda item: (item.line, item.qualified_name))
+        ),
         calls=tuple(sorted(visitor.calls, key=lambda item: (item.line, item.expression))),
     )

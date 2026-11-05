@@ -25,7 +25,11 @@ def _init_project(repo: Path) -> tuple[str, str]:
     files = {
         "src/app/core.py": "VALUE = 1\n",
         "src/app/service.py": "from app.core import VALUE\n",
-        "tests/test_service.py": "from app.service import VALUE\ndef test_value():\n    assert VALUE\n",
+        "tests/test_service.py": (
+            "from app.service import VALUE\n"
+            "def test_value():\n"
+            "    assert VALUE\n"
+        ),
     }
     for name, source in files.items():
         path = repo / name
@@ -58,6 +62,7 @@ def test_analyze_repository_reports_diff_and_test_impact(tmp_path: Path) -> None
     payload = report.to_dict()
     assert payload["analysis_kind"] == "static-python-import-impact"
     assert payload["limitations"]
+
 
 def test_analysis_rejects_dirty_worktree(tmp_path: Path) -> None:
     repo = tmp_path / "project"

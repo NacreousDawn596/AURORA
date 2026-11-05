@@ -22,7 +22,7 @@ def test_module_name_rejects_absolute_and_parent_paths() -> None:
 
 def test_ast_extracts_imports_symbols_and_calls_without_execution(tmp_path: Path) -> None:
     sentinel = tmp_path / "executed.txt"
-    source = f'''
+    source = f"""
 import os as operating_system
 from .helpers import build, CONSTANT
 from package.submodule import Thing
@@ -36,7 +36,7 @@ async def fetch():
 
 def side_effect():
     open({str(sentinel)!r}, "w").write("bad")
-'''
+"""
     result = analyze_python_source("pkg/worker.py", source)
 
     assert result.syntax_error is None

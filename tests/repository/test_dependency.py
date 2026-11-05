@@ -17,11 +17,19 @@ def _write(root: Path, relative: str, source: str) -> None:
 
 def _sample_repository(root: Path) -> None:
     _write(root, "src/pkg/__init__.py", "from .core import Core\n")
-    _write(root, "src/pkg/core.py", "from .base import Base\nfrom . import helper\nclass Core(Base):\n    pass\n")
+    _write(
+        root,
+        "src/pkg/core.py",
+        "from .base import Base\nfrom . import helper\nclass Core(Base):\n    pass\n",
+    )
     _write(root, "src/pkg/base.py", "class Base:\n    pass\n")
     _write(root, "src/pkg/helper.py", "from .core import Core\n")
     _write(root, "src/app/service.py", "from pkg.core import Core\n")
-    _write(root, "tests/test_service.py", "from app.service import Service\ndef test_service():\n    pass\n")
+    _write(
+        root,
+        "tests/test_service.py",
+        "from app.service import Service\ndef test_service():\n    pass\n",
+    )
     _write(root, "tests/test_core.py", "from pkg.core import Core\ndef test_core():\n    pass\n")
     _write(root, "tests/helpers.py", "VALUE = 1\n")
     _write(root, ".venv/lib/ignored.py", "raise RuntimeError('must never execute')\n")
@@ -87,7 +95,9 @@ def test_syntax_errors_are_reported_and_graph_still_builds(tmp_path: Path) -> No
     assert len(graph.modules) == 2
     assert len(graph.syntax_errors) == 1
     assert "src/broken.py" in graph.syntax_errors[0]
-    assert any("incomplete" in item for item in compute_test_impact(graph, ["src/good.py"]).rationale)
+    assert any(
+        "incomplete" in item for item in compute_test_impact(graph, ["src/good.py"]).rationale
+    )
 
 
 def test_max_file_limit_is_enforced(tmp_path: Path) -> None:
@@ -135,11 +145,13 @@ def test_symlinked_python_files_are_not_followed(tmp_path: Path) -> None:
     graph = build_python_graph(tmp_path)
     assert {item.path for item in graph.modules} == {"real.py"}
 
+
 def test_relative_import_above_top_level_is_not_added_to_graph(tmp_path: Path) -> None:
     _write(tmp_path, "module.py", "from .helper import VALUE\n")
     _write(tmp_path, "helper.py", "VALUE = 1\n")
     graph = build_python_graph(tmp_path)
     assert graph.edges == ()
+
 
 def test_deleted_module_importers_are_still_candidate_tests(tmp_path: Path) -> None:
     _write(tmp_path, "src/pkg/consumer.py", "from pkg.old_module import Removed\n")
@@ -150,6 +162,7 @@ def test_deleted_module_importers_are_still_candidate_tests(tmp_path: Path) -> N
 
     assert "src/pkg/consumer.py" in impact.impacted_python_paths
     assert impact.candidate_test_paths == ("tests/test_consumer.py",)
+
 
 def test_dotted_import_tracks_parent_package_initializers(tmp_path: Path) -> None:
     _write(tmp_path, "src/pkg/__init__.py", "PACKAGE = True\n")
