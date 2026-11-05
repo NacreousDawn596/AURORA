@@ -17,7 +17,10 @@ def test_prioritizes_value_per_unit_cost() -> None:
 
 
 def test_mandatory_tests_are_never_dropped_even_over_budget() -> None:
-    candidates = [TestCandidate("required", 0.1, 0, 8, mandatory=True), TestCandidate("optional", 0.9, 0, 1)]
+    candidates = [
+        TestCandidate("required", 0.1, 0, 8, mandatory=True),
+        TestCandidate("optional", 0.9, 0, 1),
+    ]
     result = prioritize(candidates, budget_seconds=2)
     assert [item.test_id for item in result.selected] == ["required"]
     assert [item.test_id for item in result.deferred] == ["optional"]
