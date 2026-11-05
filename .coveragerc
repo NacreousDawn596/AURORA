@@ -1,0 +1,4 @@
+[run]
+source = src/aurora
+branch = True
+show_missing = True
