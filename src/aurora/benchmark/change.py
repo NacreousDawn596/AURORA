@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+import re
 from collections import Counter
 from dataclasses import dataclass
 from pathlib import PurePosixPath
-import re
 
 
 _DIFF_HEADER = re.compile(r"^diff --git a/(.+) b/(.+)$")
