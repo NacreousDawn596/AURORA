@@ -9,7 +9,10 @@ from aurora.benchmark.splits import TemporalSplitError, chronological_split
 def _run(project: str, day: int, build_id: str | None = None) -> BuildRun:
     return BuildRun(
         BuildRecord(
-            project, "PR-1", build_id or str(day), "0",
+            project,
+            "PR-1",
+            build_id or str(day),
+            "0",
             datetime(2024, 1, day, tzinfo=UTC),
         ),
         (TestExecution(f"test-{day}", 1, TestOutcome.PASSED),),

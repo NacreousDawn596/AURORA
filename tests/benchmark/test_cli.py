@@ -59,9 +59,9 @@ def test_inspect_lrts_writes_json_summary(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
     metadata, root = _fixture_dataset(tmp_path)
-    assert main(
-        ["inspect-lrts", "--metadata", str(metadata), "--test-results-root", str(root)]
-    ) == 0
+    assert (
+        main(["inspect-lrts", "--metadata", str(metadata), "--test-results-root", str(root)]) == 0
+    )
     payload = json.loads(capsys.readouterr().out)
     assert payload["dataset"] == "LRTS"
     assert payload["build_stage_runs"] == 1
@@ -74,23 +74,26 @@ def test_replay_lrts_writes_results_and_manifest(
 ) -> None:
     metadata, root = _fixture_dataset(tmp_path)
     manifest = tmp_path / "runs" / "manifest.json"
-    assert main(
-        [
-            "replay-lrts",
-            "--metadata",
-            str(metadata),
-            "--test-results-root",
-            str(root),
-            "--strategy",
-            "fastest_first",
-            "--budget-seconds",
-            "1",
-            "--seed",
-            "9",
-            "--manifest",
-            str(manifest),
-        ]
-    ) == 0
+    assert (
+        main(
+            [
+                "replay-lrts",
+                "--metadata",
+                str(metadata),
+                "--test-results-root",
+                str(root),
+                "--strategy",
+                "fastest_first",
+                "--budget-seconds",
+                "1",
+                "--seed",
+                "9",
+                "--manifest",
+                str(manifest),
+            ]
+        )
+        == 0
+    )
     payload = json.loads(capsys.readouterr().out)
     assert payload["strategy"] == "fastest_first"
     assert payload["runs"][0]["executed_test_ids"] == ["pkg.Fast"]

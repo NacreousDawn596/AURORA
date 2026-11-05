@@ -13,8 +13,12 @@ def _test(
     relevance: float = 0,
 ) -> TestExecution:
     return TestExecution(
-        name, duration, outcome, previous_outcome=previous,
-        last_failure_age_builds=age, coverage_score=coverage,
+        name,
+        duration,
+        outcome,
+        previous_outcome=previous,
+        last_failure_age_builds=age,
+        coverage_score=coverage,
         change_relevance=relevance,
     )
 
@@ -33,9 +37,7 @@ def test_random_order_is_reproducible_for_seed() -> None:
 
 def test_fastest_first_uses_test_id_for_ties() -> None:
     tests = [_test("z", 1), _test("a", 1), _test("middle", 0.5)]
-    assert [item.test_id for item in order_tests(tests, "fastest_first")] == [
-        "middle", "a", "z"
-    ]
+    assert [item.test_id for item in order_tests(tests, "fastest_first")] == ["middle", "a", "z"]
 
 
 def test_recent_failure_first_uses_prior_failure_age() -> None:
@@ -46,7 +48,10 @@ def test_recent_failure_first_uses_prior_failure_age() -> None:
         _test("immediate", 1, previous=TestOutcome.FAILED),
     ]
     assert [item.test_id for item in order_tests(tests, "recent_failure_first")] == [
-        "immediate", "recent", "older", "never"
+        "immediate",
+        "recent",
+        "older",
+        "never",
     ]
 
 

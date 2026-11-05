@@ -36,19 +36,11 @@ def observed_failure_recall_at_budget(
     Return None when the full run contains no failed tests.
     """
     _validate_budget(budget_seconds)
-    failed = {
-        test.test_id
-        for test in ordered_tests
-        if test.outcome is TestOutcome.FAILED
-    }
+    failed = {test.test_id for test in ordered_tests if test.outcome is TestOutcome.FAILED}
     if not failed:
         return None
     executed = _executed_prefix(ordered_tests, budget_seconds)
-    detected = {
-        test.test_id
-        for test in executed
-        if test.outcome is TestOutcome.FAILED
-    }
+    detected = {test.test_id for test in executed if test.outcome is TestOutcome.FAILED}
     return len(detected & failed) / len(failed)
 
 
@@ -63,11 +55,7 @@ def fault_recall_at_budget(
     if not faults:
         return None
     executed = _executed_prefix(ordered_tests, budget_seconds)
-    detected = (
-        set().union(*(test.detected_faults for test in executed))
-        if executed
-        else set()
-    )
+    detected = set().union(*(test.detected_faults for test in executed)) if executed else set()
     return len(detected & faults) / len(faults)
 
 
@@ -94,11 +82,7 @@ def apfdc(
     area = 0.0
     for test in ordered_tests:
         newly_detected = (set(test.detected_faults) & faults) - detected
-        area += (
-            test.duration_seconds
-            * (len(detected) + len(newly_detected) / 2.0)
-            / len(faults)
-        )
+        area += test.duration_seconds * (len(detected) + len(newly_detected) / 2.0) / len(faults)
         detected.update(newly_detected)
     return area / total_cost
 

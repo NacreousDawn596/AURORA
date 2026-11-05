@@ -37,21 +37,45 @@ def test_manifest_creation_records_checksum_and_reproducibility_fields(tmp_path:
 def test_manifest_rejects_invalid_budget(budget: float) -> None:
     with pytest.raises(ValueError, match="budget_seconds"):
         ExperimentManifest(
-            "1", "LRTS", "dataset.csv", "0" * 64, "results",
-            "fastest_first", budget, 1, None, "2024-01-01T00:00:00+00:00",
+            "1",
+            "LRTS",
+            "dataset.csv",
+            "0" * 64,
+            "results",
+            "fastest_first",
+            budget,
+            1,
+            None,
+            "2024-01-01T00:00:00+00:00",
         )
 
 
 def test_manifest_rejects_invalid_digest_and_timezone() -> None:
     with pytest.raises(ValueError, match="hexadecimal"):
         ExperimentManifest(
-            "1", "LRTS", "dataset.csv", "x" * 64, "results",
-            "fastest_first", 1, 1, None, "2024-01-01T00:00:00+00:00",
+            "1",
+            "LRTS",
+            "dataset.csv",
+            "x" * 64,
+            "results",
+            "fastest_first",
+            1,
+            1,
+            None,
+            "2024-01-01T00:00:00+00:00",
         )
     with pytest.raises(ValueError, match="timezone"):
         ExperimentManifest(
-            "1", "LRTS", "dataset.csv", "0" * 64, "results",
-            "fastest_first", 1, 1, None, "2024-01-01T00:00:00",
+            "1",
+            "LRTS",
+            "dataset.csv",
+            "0" * 64,
+            "results",
+            "fastest_first",
+            1,
+            1,
+            None,
+            "2024-01-01T00:00:00",
         )
 
 

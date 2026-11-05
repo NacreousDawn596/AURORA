@@ -85,12 +85,22 @@ def test_lrts_permissive_mode_keeps_valid_rows_and_reports_bad_rows(tmp_path: Pa
         )
         writer.writeheader()
         writer.writerow(
-            {"project": "kafka", "pr_name": "PR-1", "build_id": "1", "stage_id": "0",
-             "build_timestamp": "1700000000"}
+            {
+                "project": "kafka",
+                "pr_name": "PR-1",
+                "build_id": "1",
+                "stage_id": "0",
+                "build_timestamp": "1700000000",
+            }
         )
         writer.writerow(
-            {"project": "kafka", "pr_name": "PR-2", "build_id": "2", "stage_id": "0",
-             "build_timestamp": "1700000100"}
+            {
+                "project": "kafka",
+                "pr_name": "PR-2",
+                "build_id": "2",
+                "stage_id": "0",
+                "build_timestamp": "1700000100",
+            }
         )
     result = load_lrts_dataset(metadata, root, strict=False)
     assert len(result.runs) == 1

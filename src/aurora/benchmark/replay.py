@@ -82,6 +82,5 @@ def compare_strategies(
 ) -> tuple[ReplayResult, ...]:
     """Evaluate multiple strategies with identical tests, budget and seed."""
     return tuple(
-        replay(tests, strategy, budget_seconds=budget_seconds, seed=seed)
-        for strategy in strategies
+        replay(tests, strategy, budget_seconds=budget_seconds, seed=seed) for strategy in strategies
     )

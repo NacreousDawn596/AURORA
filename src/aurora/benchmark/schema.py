@@ -44,12 +44,8 @@ class TestExecution:
             raise ValueError("coverage_score must be finite and between 0 and 1")
         if not isfinite(self.change_relevance) or not 0.0 <= self.change_relevance <= 1.0:
             raise ValueError("change_relevance must be finite and between 0 and 1")
-        if (
-            self.last_failure_age_builds is not None
-            and (
-                isinstance(self.last_failure_age_builds, bool)
-                or self.last_failure_age_builds < 0
-            )
+        if self.last_failure_age_builds is not None and (
+            isinstance(self.last_failure_age_builds, bool) or self.last_failure_age_builds < 0
         ):
             raise ValueError("last_failure_age_builds must be a non-negative integer")
         try:

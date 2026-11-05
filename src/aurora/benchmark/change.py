@@ -5,7 +5,6 @@ import dataclasses
 import pathlib
 import re
 
-
 _DIFF_HEADER = re.compile(r"^diff --git a/(.+) b/(.+)$")
 
 

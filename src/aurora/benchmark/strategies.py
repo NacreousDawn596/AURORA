@@ -51,7 +51,5 @@ def order_tests(
     elif selected_strategy is Strategy.COVERAGE_FIRST:
         ordered.sort(key=lambda item: (-item.coverage_score, item.duration_seconds, item.test_id))
     elif selected_strategy is Strategy.CHANGE_IMPACT_FIRST:
-        ordered.sort(
-            key=lambda item: (-item.change_relevance, item.duration_seconds, item.test_id)
-        )
+        ordered.sort(key=lambda item: (-item.change_relevance, item.duration_seconds, item.test_id))
     return tuple(ordered)

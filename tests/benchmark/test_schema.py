@@ -19,9 +19,7 @@ def test_test_execution_rejects_invalid_duration(duration: float) -> None:
 
 @pytest.mark.parametrize("score_name", ["coverage_score", "change_relevance"])
 @pytest.mark.parametrize("score", [-0.01, 1.01])
-def test_test_execution_rejects_scores_outside_unit_interval(
-    score_name: str, score: float
-) -> None:
+def test_test_execution_rejects_scores_outside_unit_interval(score_name: str, score: float) -> None:
     values = {"coverage_score": 0.0, "change_relevance": 0.0}
     values[score_name] = score
     with pytest.raises(ValueError, match=score_name):

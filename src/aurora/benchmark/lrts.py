@@ -85,12 +85,7 @@ def normalize_outcome(value: str | None, *, allow_empty: bool = False) -> TestOu
 
 def _safe_component(value: str, field_name: str) -> str:
     component = value.strip()
-    if (
-        not component
-        or component in {".", ".."}
-        or "/" in component
-        or "\\" in component
-    ):
+    if not component or component in {".", ".."} or "/" in component or "\\" in component:
         raise DatasetIngestionError(f"unsafe {field_name} path component: {value!r}")
     return component
 
@@ -112,12 +107,8 @@ def _read_test_class_zip(path: Path) -> tuple[TestExecution, ...]:
         raise DatasetIngestionError(f"test result archive not found: {path}")
     try:
         with zipfile.ZipFile(path) as archive:
-            csv_names = [
-                name for name in archive.namelist() if name.casefold().endswith(".csv")
-            ]
-            preferred = [
-                name for name in csv_names if Path(name).name == "test_class.csv"
-            ]
+            csv_names = [name for name in archive.namelist() if name.casefold().endswith(".csv")]
+            preferred = [name for name in csv_names if Path(name).name == "test_class.csv"]
             if len(preferred) == 1:
                 csv_name = preferred[0]
             elif len(csv_names) == 1:
@@ -127,9 +118,7 @@ def _read_test_class_zip(path: Path) -> tuple[TestExecution, ...]:
                     f"expected one test-class CSV in {path.name}, found {len(csv_names)}"
                 )
             with archive.open(csv_name) as binary_file:
-                text_file = io.TextIOWrapper(
-                    binary_file, encoding="utf-8-sig", newline=""
-                )
+                text_file = io.TextIOWrapper(binary_file, encoding="utf-8-sig", newline="")
                 return _parse_test_rows(text_file, archive_path=path)
     except zipfile.BadZipFile as exc:
         raise DatasetIngestionError(f"invalid ZIP archive: {path}") from exc
@@ -139,9 +128,7 @@ def _parse_test_rows(stream: TextIO, *, archive_path: Path) -> tuple[TestExecuti
     reader = csv.DictReader(stream)
     if reader.fieldnames is None:
         raise DatasetIngestionError(f"empty CSV in {archive_path}")
-    normalized_headers = {
-        name.strip().casefold() for name in reader.fieldnames if name
-    }
+    normalized_headers = {name.strip().casefold() for name in reader.fieldnames if name}
     required = {"testclass", "duration", "outcome"}
     missing = required - normalized_headers
     if missing:
@@ -149,23 +136,15 @@ def _parse_test_rows(stream: TextIO, *, archive_path: Path) -> tuple[TestExecuti
             f"{archive_path} is missing required columns: {', '.join(sorted(missing))}"
         )
 
-    header_map = {
-        name.strip().casefold(): name for name in reader.fieldnames if name
-    }
+    header_map = {name.strip().casefold(): name for name in reader.fieldnames if name}
     tests: list[TestExecution] = []
     for row_number, row in enumerate(reader, start=2):
         test_id = (row.get(header_map["testclass"]) or "").strip()
         if not test_id:
-            raise DatasetIngestionError(
-                f"empty testclass at {archive_path}:{row_number}"
-            )
-        duration = _parse_nonnegative_float(
-            row.get(header_map["duration"]), "duration"
-        )
+            raise DatasetIngestionError(f"empty testclass at {archive_path}:{row_number}")
+        duration = _parse_nonnegative_float(row.get(header_map["duration"]), "duration")
         outcome = normalize_outcome(row.get(header_map["outcome"]))
-        previous = normalize_outcome(
-            row.get(header_map.get("last_outcome", "")), allow_empty=True
-        )
+        previous = normalize_outcome(row.get(header_map.get("last_outcome", "")), allow_empty=True)
         assert duration is not None and outcome is not None
         try:
             tests.append(
@@ -197,9 +176,7 @@ def _lrts_archive_path(root: Path, row: dict[str, str]) -> Path:
     try:
         path.relative_to(root.resolve())
     except ValueError as exc:
-        raise DatasetIngestionError(
-            "test result path escapes the supplied dataset root"
-        ) from exc
+        raise DatasetIngestionError("test result path escapes the supplied dataset root") from exc
     return path
 
 
@@ -232,15 +209,10 @@ def load_lrts_dataset(
         missing = required - headers
         if missing:
             raise DatasetIngestionError(
-                "metadata CSV is missing required columns: "
-                + ", ".join(sorted(missing))
+                "metadata CSV is missing required columns: " + ", ".join(sorted(missing))
             )
         for line_number, raw_row in enumerate(reader, start=2):
-            row = {
-                key.strip(): (value or "").strip()
-                for key, value in raw_row.items()
-                if key
-            }
+            row = {key.strip(): (value or "").strip() for key, value in raw_row.items() if key}
             try:
                 project = _safe_component(row["project"], "project")
                 pr_name = _safe_component(row["pr_name"], "pr_name")
@@ -259,9 +231,7 @@ def load_lrts_dataset(
                     test_suite_duration_seconds=duration,
                 )
                 if record.record_id in seen:
-                    raise DatasetIngestionError(
-                        f"duplicate build-stage record: {record.record_id}"
-                    )
+                    raise DatasetIngestionError(f"duplicate build-stage record: {record.record_id}")
                 archive_path = _lrts_archive_path(results_root, row)
                 tests = _read_test_class_zip(archive_path)
                 runs.append(BuildRun(build=record, tests=tests))
@@ -325,11 +295,7 @@ def enrich_history_features(runs: tuple[BuildRun, ...]) -> tuple[BuildRun, ...]:
                     previous_outcome_from_history, last_failure_index = previous_state
                     if previous_outcome is None:
                         previous_outcome = previous_outcome_from_history
-                age = (
-                    history_index - last_failure_index
-                    if last_failure_index is not None
-                    else None
-                )
+                age = history_index - last_failure_index if last_failure_index is not None else None
                 enriched.append(
                     replace(
                         test,
@@ -342,20 +308,12 @@ def enrich_history_features(runs: tuple[BuildRun, ...]) -> tuple[BuildRun, ...]:
 
         for test_key, outcomes in pending_updates.items():
             known = {
-                value
-                for value in outcomes
-                if value in {TestOutcome.PASSED, TestOutcome.FAILED}
+                value for value in outcomes if value in {TestOutcome.PASSED, TestOutcome.FAILED}
             }
             if len(known) == 1:
                 current = next(iter(known))
-                prior_failure = history.get(
-                    test_key, (TestOutcome.UNKNOWN, None)
-                )[1]
-                last_failure = (
-                    history_index
-                    if current is TestOutcome.FAILED
-                    else prior_failure
-                )
+                prior_failure = history.get(test_key, (TestOutcome.UNKNOWN, None))[1]
+                last_failure = history_index if current is TestOutcome.FAILED else prior_failure
                 history[test_key] = (current, last_failure)
             elif len(known) > 1:
                 # A failure occurred in this bucket, but the simultaneous outcome is ambiguous.
