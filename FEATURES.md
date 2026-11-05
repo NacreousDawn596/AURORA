@@ -32,11 +32,11 @@ Legend: [x] implemented; [~] partial/scaffolded; [ ] planned; [!] requires resea
 - [x] Python import graph with absolute and relative import resolution.
 - [x] Reverse dependency traversal and impacted Python path enumeration.
 - [x] Conservative candidate-test report.
-- [x] `analyze-repo` JSON CLI.
-- [x] Tests for Git refs, repo paths with spaces, AST syntax errors, relative imports, cycles, transitive impact and path limits.
+- [x] analyze-repo JSON CLI.
+- [x] Per-test coverage.py JSON context ingestion.
+- [x] Test-to-source-file graph with executed line numbers and report checksum.
+- [x] Changed-file lookup against observed coverage contexts.
 - [ ] Java/TypeScript and other language frontends.
-- [ ] Dynamic coverage ingestion.
-- [ ] Test-to-code coverage graph.
 - [ ] Runtime call graph extraction.
 - [ ] Temporal graph snapshots and feature provenance.
 - [ ] Framework-aware test discovery and execution adapters.

@@ -104,3 +104,72 @@ def test_analyze_repo_cli_can_write_report_to_file(tmp_path: Path) -> None:
     payload = json.loads(output.read_text(encoding="utf-8"))
     assert payload["base_commit"] == base
     assert payload["head_commit"] == head
+
+
+def test_map_coverage_cli_reports_tests_for_changed_path(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    repo = tmp_path / "project"
+    _, head = _repo(repo)
+    report = tmp_path / "coverage.json"
+    report.write_text(
+        json.dumps(
+            {
+                "meta": {"version": 3, "show_contexts": True},
+                "files": {
+                    "src/pkg.py": {
+                        "executed_lines": [1],
+                        "contexts": {"1": ["tests.test_pkg.test_value"]},
+                    }
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    assert (
+        main(
+            [
+                "map-coverage",
+                "--repo-path",
+                str(repo),
+                "--revision",
+                head,
+                "--coverage-json",
+                str(report),
+                "--changed-path",
+                "src/pkg.py",
+            ]
+        )
+        == 0
+    )
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["test_context_count"] == 1
+    assert payload["covered_test_contexts_by_changed_path"] == {
+        "src/pkg.py": ["tests.test_pkg.test_value"]
+    }
+
+
+def test_map_coverage_cli_rejects_dirty_checkout(tmp_path: Path) -> None:
+    repo = tmp_path / "project"
+    _, head = _repo(repo)
+    report = tmp_path / "coverage.json"
+    report.write_text(
+        json.dumps({"meta": {"show_contexts": True}, "files": {}}),
+        encoding="utf-8",
+    )
+    (repo / "src/pkg.py").write_text("VALUE = 99\n", encoding="utf-8")
+
+    with pytest.raises(SystemExit) as error:
+        main(
+            [
+                "map-coverage",
+                "--repo-path",
+                str(repo),
+                "--revision",
+                head,
+                "--coverage-json",
+                str(report),
+            ]
+        )
+    assert error.value.code == 2

@@ -21,7 +21,7 @@ The proposed research contribution is evidence-calibrated, interaction-aware ada
 ### Experimental workbench
 
 - LRTS processed-dataset adapter (test-class within build-stage granularity).
-- Normalized immutable build and test execution records.
+- Normalized immutable build and test-execution records.
 - UTC timestamp normalization and per-project chronological splits.
 - Prior-only historical failure-age features.
 - Deterministic baselines: input order, seeded random, fastest-first, recent-failure-first, coverage-first and change-impact-first.
@@ -35,16 +35,16 @@ Historical LRTS failing-test recall is an observed test-failure proxy, not causa
 
 - Safe local Git revision resolution and unified-diff extraction.
 - Non-executing Python AST extraction for imports, symbols and call expressions.
-- Static Python import/dependency graph, including relative imports.
-- Reverse dependency traversal to propose impacted Python test candidates.
-- JSON report through `aurora-benchmark analyze-repo`.
+- Static Python import/dependency graph with reverse dependency traversal.
+- Conservative candidate-test report through the analyze-repo command.
+- Per-test dynamic coverage graph from coverage.py JSON contexts through the map-coverage command.
 
-This is conservative static analysis, not runtime coverage, a complete call graph or proof that a candidate test will detect a fault. It currently analyzes Python source only.
+Static imports and dynamic line coverage are complementary evidence, not proof of semantic dependence or fault detection. Coverage contexts must be configured per test, and the report's Git revision is operator-attested rather than embedded in coverage.py JSON.
 
 ### Engineering foundation
 
 - Python package and command-line tools.
-- Granular tests for ingestion, history, splitting, ordering, replay, metrics, manifests, diff parsing, Git comparison, AST extraction, dependency resolution and CLI behavior.
+- Granular tests for ingestion, history, splitting, ordering, replay, metrics, manifests, diff parsing, Git comparison, AST extraction, dependency resolution, coverage mapping and CLI behavior.
 - GitHub Actions CI on every push and pull request.
 - OCI container build and smoke validation.
 
@@ -52,58 +52,63 @@ This is conservative static analysis, not runtime coverage, a complete call grap
 
 Requires Python 3.11 or newer.
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install -e ".[dev]"
-pytest
-ruff check .
-ruff format --check .
-mypy
-```
+    python -m venv .venv
+    source .venv/bin/activate
+    python -m pip install -e ".[dev]"
+    pytest
+    ruff check .
+    ruff format --check .
+    mypy
 
 Run the scheduler demo:
 
-```bash
-python -m aurora
-```
+    python -m aurora
 
 Inspect benchmark commands:
 
-```bash
-aurora-benchmark --help
-```
+    aurora-benchmark --help
 
 Analyze a local repository revision range:
 
-```bash
-aurora-benchmark analyze-repo \
-  --repo-path /path/to/project \
-  --base main \
-  --head HEAD \
-  --output aurora-impact.json
-```
+    aurora-benchmark analyze-repo \
+      --repo-path /path/to/project \
+      --base main \
+      --head HEAD \
+      --output aurora-impact.json
 
-The report includes changed files, additions/deletions, parsed Python module count, dependency edge count, impacted Python paths, candidate test paths and static-analysis limitations. The repository must be checked out at the requested `--head` with a clean worktree; ignored untracked Python files are rejected too. The analyzer does not execute repository code or run tests.
+Build a per-test coverage graph for a clean checkout:
+
+    coverage json --show-contexts -o /tmp/coverage.json
+    aurora-benchmark map-coverage \
+      --repo-path /path/to/project \
+      --revision HEAD \
+      --coverage-json /tmp/coverage.json \
+      --changed-path src/package/service.py \
+      --output coverage-graph.json
+
+The repository analyzer does not execute repository code or run tests. The coverage
+adapter reads an existing coverage.py report; it does not run tests or fabricate
+per-test attribution from aggregate coverage.
 
 ## LRTS dataset
 
-AURORA does not vendor the external dataset. Follow [docs/DATASETS.md](docs/DATASETS.md) to obtain the processed LRTS artifact and run its inspection/replay adapter.
+AURORA does not vendor the external dataset. Follow docs/DATASETS.md to obtain the processed LRTS artifact and run its inspection/replay adapter.
 
 ## Documentation
 
-- [Project definition](PROJECT.md)
-- [Feature register](FEATURES.md)
-- [Development stages](STAGES.md)
-- [Changelog](CHANGELOG.md)
-- [Research plan](docs/RESEARCH.md)
-- [Architecture](docs/ARCHITECTURE.md)
-- [Repository intelligence](docs/REPOSITORY_INTELLIGENCE.md)
-- [Experiment protocol](docs/EXPERIMENTS.md)
-- [Benchmark strategies and metrics](docs/BENCHMARKS.md)
-- [Dataset acquisition](docs/DATASETS.md)
-- [Normalized data format](docs/DATA_FORMAT.md)
-- [Contribution guide](CONTRIBUTING.md)
-- [Security policy](SECURITY.md)
+- Project definition: PROJECT.md
+- Feature register: FEATURES.md
+- Development stages: STAGES.md
+- Changelog: CHANGELOG.md
+- Research plan: docs/RESEARCH.md
+- Architecture: docs/ARCHITECTURE.md
+- Repository intelligence: docs/REPOSITORY_INTELLIGENCE.md
+- Coverage evidence: docs/COVERAGE_EVIDENCE.md
+- Experiment protocol: docs/EXPERIMENTS.md
+- Benchmark strategies and metrics: docs/BENCHMARKS.md
+- Dataset acquisition: docs/DATASETS.md
+- Normalized data format: docs/DATA_FORMAT.md
+- Contribution guide: CONTRIBUTING.md
+- Security policy: SECURITY.md
 
-Licensed under Apache-2.0. See [LICENSE](LICENSE).
+Licensed under Apache-2.0. See LICENSE.

@@ -55,7 +55,7 @@ Implemented under src/aurora/benchmark/:
 | metrics.py | Budget-aware test-failure and known-fault metrics |
 | replay.py | Offline fixed-budget strategy replay |
 | manifest.py | Dataset metadata checksum and reproducibility manifest |
-| cli.py | Dataset inspection, replay and repository analysis commands |
+| cli.py | Dataset inspection, replay and repository/coverage analysis commands |
 | change.py | Unified-diff file and line statistics |
 
 ### Repository intelligence
@@ -68,10 +68,13 @@ Implemented under src/aurora/repository/:
 | python_ast.py | Parse Python source without execution; extract imports, symbols and call expressions |
 | dependency.py | Scan Python files, resolve static imports and build importer-to-dependency edges |
 | analysis.py | Combine Git changes and Python dependency evidence into a candidate-test report |
+| coverage.py | Ingest coverage.py per-line contexts and build test-context-to-source-file evidence edges |
 
-The initial analyzer understands standard src/ layouts and ordinary Python packages. It skips common generated/vendor directories, ignores symlinked Python files, applies file-count and file-size limits, reports parse/scan issues, and handles cycles during reverse dependency traversal.
+The initial analyzer understands standard src/ layouts and ordinary Python packages. It skips common generated/vendor directories, avoids following symlinks and applies file-count/source-size limits.
 
-This is not a full semantic analyzer. It does not execute code, infer dynamic imports, derive runtime coverage, guarantee test reachability or prove that a candidate test detects a fault. It currently analyzes Python source only.
+The coverage adapter consumes coverage.py JSON generated with --show-contexts. It preserves opaque context labels, validates report paths stay under the repository root, checks line/context consistency, and includes a report SHA-256. The supplied Git revision is resolved and checked against a clean checkout, but is an operator attestation because the coverage report itself does not embed Git provenance.
+
+Static imports and dynamic line coverage are complementary but incomplete. Neither proves semantic dependence or fault detection. The analyzer does not execute analyzed source code.
 
 ## Target data flow
 
@@ -112,4 +115,4 @@ A scheduling decision has candidate set, selected test/batch, score components, 
 
 ## Implementation status
 
-The repository contains the Stage 1 experimental workbench and an initial Python static repository-intelligence layer. Predictive ML, dynamic coverage, multi-language analysis, adaptive sequential scheduling, agentic orchestration and production deployment remain planned.
+The repository contains the Stage 1 experimental workbench, a Python static repository-intelligence layer, and a per-test dynamic coverage graph adapter. Predictive ML, multi-language analysis, runtime call graphs, adaptive sequential scheduling, agentic orchestration and production deployment remain planned.
