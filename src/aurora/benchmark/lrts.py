@@ -358,11 +358,13 @@ def enrich_history_features(runs: tuple[BuildRun, ...]) -> tuple[BuildRun, ...]:
                 )
                 history[test_key] = (current, last_failure)
             elif len(known) > 1:
-                # Conflicting same-time observations are not ordered arbitrarily.
-                prior_failure = history.get(
-                    test_key, (TestOutcome.UNKNOWN, None)
-                )[1]
-                history[test_key] = (TestOutcome.UNKNOWN, prior_failure)
+                # A failure occurred in this bucket, but the simultaneous outcome is ambiguous.
+                history[test_key] = (
+                    TestOutcome.UNKNOWN,
+                    history_index
+                    if TestOutcome.FAILED in known
+                    else history.get(test_key, (TestOutcome.UNKNOWN, None))[1],
+                )
 
     return tuple(
         sorted(

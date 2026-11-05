@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-import re
 from collections import Counter
 from dataclasses import dataclass
 from pathlib import PurePosixPath
+import re
 
 
 _DIFF_HEADER = re.compile(r"^diff --git a/(.+) b/(.+)$")
@@ -96,17 +96,27 @@ def parse_unified_diff(diff_text: str) -> ChangeSummary:
             continue
         if current_path is None:
             continue
-        if line.startswith("rename from "):
+        if not in_hunk and line.startswith("rename from "):
             old_path = line.removeprefix("rename from ")
-        elif line.startswith("rename to "):
+        elif not in_hunk and line.startswith("rename to "):
             current_path = line.removeprefix("rename to ")
+        elif not in_hunk and line.startswith("--- "):
+            value = line[4:].strip()
+            if value == "/dev/null":
+                old_path = None
+            elif value.startswith("a/"):
+                old_path = value[2:]
+        elif not in_hunk and line.startswith("+++ "):
+            value = line[4:].strip()
+            if value.startswith("b/"):
+                current_path = value[2:]
         elif line.startswith("@@"):
             in_hunk = True
         elif line.startswith("Binary files ") or line.startswith("GIT binary patch"):
             is_binary = True
-        elif in_hunk and line.startswith("+") and not line.startswith("\\ No newline"):
+        elif in_hunk and line.startswith("+"):
             additions += 1
-        elif in_hunk and line.startswith("-") and not line.startswith("\\ No newline"):
+        elif in_hunk and line.startswith("-"):
             deletions += 1
 
     finish()
