@@ -15,7 +15,8 @@ def _fixture_dataset(tmp_path: Path) -> tuple[Path, Path]:
     folder.mkdir(parents=True)
     csv_buffer = io.StringIO()
     writer = csv.DictWriter(
-        csv_buffer, fieldnames=["testclass", "duration", "outcome", "last_outcome"]
+        csv_buffer,
+        fieldnames=["testclass", "duration", "outcome", "last_outcome"],
     )
     writer.writeheader()
     writer.writerows(
@@ -32,7 +33,11 @@ def _fixture_dataset(tmp_path: Path) -> tuple[Path, Path]:
         writer = csv.DictWriter(
             handle,
             fieldnames=[
-                "project", "pr_name", "build_id", "stage_id", "build_timestamp",
+                "project",
+                "pr_name",
+                "build_id",
+                "stage_id",
+                "build_timestamp",
                 "test_suite_duration_s",
             ],
         )
@@ -50,7 +55,9 @@ def _fixture_dataset(tmp_path: Path) -> tuple[Path, Path]:
     return metadata, root
 
 
-def test_inspect_lrts_writes_json_summary(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+def test_inspect_lrts_writes_json_summary(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     metadata, root = _fixture_dataset(tmp_path)
     assert main(
         ["inspect-lrts", "--metadata", str(metadata), "--test-results-root", str(root)]
@@ -62,18 +69,26 @@ def test_inspect_lrts_writes_json_summary(tmp_path: Path, capsys: pytest.Capture
     assert payload["failed_test_executions"] == 1
 
 
-def test_replay_lrts_writes_results_and_manifest(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+def test_replay_lrts_writes_results_and_manifest(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     metadata, root = _fixture_dataset(tmp_path)
     manifest = tmp_path / "runs" / "manifest.json"
     assert main(
         [
             "replay-lrts",
-            "--metadata", str(metadata),
-            "--test-results-root", str(root),
-            "--strategy", "fastest_first",
-            "--budget-seconds", "1",
-            "--seed", "9",
-            "--manifest", str(manifest),
+            "--metadata",
+            str(metadata),
+            "--test-results-root",
+            str(root),
+            "--strategy",
+            "fastest_first",
+            "--budget-seconds",
+            "1",
+            "--seed",
+            "9",
+            "--manifest",
+            str(manifest),
         ]
     ) == 0
     payload = json.loads(capsys.readouterr().out)
@@ -89,9 +104,12 @@ def test_project_filter_without_matches_is_a_cli_error(tmp_path: Path) -> None:
         main(
             [
                 "inspect-lrts",
-                "--metadata", str(metadata),
-                "--test-results-root", str(root),
-                "--project", "does-not-exist",
+                "--metadata",
+                str(metadata),
+                "--test-results-root",
+                str(root),
+                "--project",
+                "does-not-exist",
             ]
         )
     assert error.value.code == 2
@@ -103,9 +121,12 @@ def test_replay_rejects_negative_budget(tmp_path: Path) -> None:
         main(
             [
                 "replay-lrts",
-                "--metadata", str(metadata),
-                "--test-results-root", str(root),
-                "--budget-seconds", "-1",
+                "--metadata",
+                str(metadata),
+                "--test-results-root",
+                str(root),
+                "--budget-seconds",
+                "-1",
             ]
         )
     assert error.value.code == 2

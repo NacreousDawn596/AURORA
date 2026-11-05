@@ -65,6 +65,7 @@ def parse_unified_diff(diff_text: str) -> ChangeSummary:
     additions = 0
     deletions = 0
     is_binary = False
+    in_hunk = False
 
     def finish() -> None:
         if current_path is not None:
@@ -91,6 +92,7 @@ def parse_unified_diff(diff_text: str) -> ChangeSummary:
             additions = 0
             deletions = 0
             is_binary = False
+            in_hunk = False
             continue
         if current_path is None:
             continue
@@ -98,21 +100,13 @@ def parse_unified_diff(diff_text: str) -> ChangeSummary:
             old_path = line.removeprefix("rename from ")
         elif line.startswith("rename to "):
             current_path = line.removeprefix("rename to ")
-        elif line.startswith("+++ "):
-            value = line[4:].strip()
-            if value.startswith("b/"):
-                current_path = value[2:]
-        elif line.startswith("--- "):
-            value = line[4:].strip()
-            if value == "/dev/null":
-                old_path = None
-            elif value.startswith("a/"):
-                old_path = value[2:]
+        elif line.startswith("@@"):
+            in_hunk = True
         elif line.startswith("Binary files ") or line.startswith("GIT binary patch"):
             is_binary = True
-        elif line.startswith("+") and not line.startswith("+++ "):
+        elif in_hunk and line.startswith("+") and not line.startswith("\\ No newline"):
             additions += 1
-        elif line.startswith("-") and not line.startswith("--- "):
+        elif in_hunk and line.startswith("-") and not line.startswith("\\ No newline"):
             deletions += 1
 
     finish()

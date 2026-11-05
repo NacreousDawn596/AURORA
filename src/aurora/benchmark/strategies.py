@@ -3,14 +3,16 @@
 from __future__ import annotations
 
 import random
-from enum import Enum
+from collections.abc import Sequence
+from enum import StrEnum
 from math import inf
-from typing import Sequence
 
 from aurora.benchmark.schema import TestExecution, TestOutcome
 
 
-class Strategy(str, Enum):
+class Strategy(StrEnum):
+    """Supported test-ordering policies."""
+
     INPUT_ORDER = "input_order"
     RANDOM = "random"
     FASTEST_FIRST = "fastest_first"
@@ -36,16 +38,20 @@ def order_tests(
     if selected_strategy is Strategy.FASTEST_FIRST:
         ordered.sort(key=lambda item: (item.duration_seconds, item.test_id))
     elif selected_strategy is Strategy.RECENT_FAILURE_FIRST:
+
         def failure_key(item: TestExecution) -> tuple[int, int | float, float, str]:
             age = item.last_failure_age_builds
             if age is None and item.previous_outcome is TestOutcome.FAILED:
                 age = 0
-            return (1, inf, item.duration_seconds, item.test_id) if age is None else (
-                0, age, item.duration_seconds, item.test_id
-            )
+            if age is None:
+                return (1, inf, item.duration_seconds, item.test_id)
+            return (0, age, item.duration_seconds, item.test_id)
+
         ordered.sort(key=failure_key)
     elif selected_strategy is Strategy.COVERAGE_FIRST:
         ordered.sort(key=lambda item: (-item.coverage_score, item.duration_seconds, item.test_id))
     elif selected_strategy is Strategy.CHANGE_IMPACT_FIRST:
-        ordered.sort(key=lambda item: (-item.change_relevance, item.duration_seconds, item.test_id))
+        ordered.sort(
+            key=lambda item: (-item.change_relevance, item.duration_seconds, item.test_id)
+        )
     return tuple(ordered)

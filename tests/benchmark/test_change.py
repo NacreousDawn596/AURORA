@@ -72,15 +72,17 @@ Binary files a/image.png and b/image.png differ
     assert result.deletions == 0
 
 
-def test_parse_ignores_hunk_headers_and_file_markers() -> None:
+def test_parse_hunk_lines_starting_with_plus_plus_are_counted() -> None:
     diff = """diff --git a/a.txt b/a.txt
 --- a/a.txt
 +++ b/a.txt
-@@ -2 +2 @@
-+real
-\ No newline at end of file
+@@ -0,0 +1,2 @@
++++ literal source line
+--- literal removed line
 """
-    assert parse_unified_diff(diff).additions == 1
+    result = parse_unified_diff(diff)
+    assert result.additions == 1
+    assert result.deletions == 1
 
 
 def test_empty_or_unrecognized_diff_is_empty() -> None:

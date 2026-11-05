@@ -30,10 +30,19 @@ def _write_archive(
     folder.mkdir(parents=True, exist_ok=True)
     buffer = io.StringIO()
     writer = csv.DictWriter(
-        buffer, fieldnames=["testclass", "duration", "outcome", "last_outcome"]
+        buffer,
+        fieldnames=["testclass", "duration", "outcome", "last_outcome"],
     )
     writer.writeheader()
-    writer.writerows(rows or [{"testclass": "pkg.TestA", "duration": "1.5", "outcome": "1", "last_outcome": "0"}])
+    default_rows = [
+        {
+            "testclass": "pkg.TestA",
+            "duration": "1.5",
+            "outcome": "1",
+            "last_outcome": "0",
+        }
+    ]
+    writer.writerows(rows if rows is not None else default_rows)
     archive_path = folder / "test_class.csv.zip"
     with zipfile.ZipFile(archive_path, "w", zipfile.ZIP_DEFLATED) as archive:
         archive.writestr(csv_name, buffer.getvalue())
@@ -42,7 +51,11 @@ def _write_archive(
 
 def _write_metadata(path: Path, rows: list[dict[str, str]]) -> None:
     fields = [
-        "project", "pr_name", "build_id", "stage_id", "build_timestamp",
+        "project",
+        "pr_name",
+        "build_id",
+        "stage_id",
+        "build_timestamp",
         "test_suite_duration_s",
     ]
     with path.open("w", encoding="utf-8", newline="") as handle:

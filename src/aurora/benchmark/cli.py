@@ -6,8 +6,8 @@ import argparse
 import json
 import os
 import sys
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Sequence
 
 from aurora.benchmark.lrts import enrich_history_features, load_lrts_dataset
 from aurora.benchmark.manifest import ExperimentManifest, write_manifest

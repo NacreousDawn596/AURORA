@@ -4,11 +4,16 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from math import isfinite
+from typing import ClassVar
 
 
-class TestOutcome(str, Enum):
+class TestOutcome(StrEnum):
+    """Normalized outcome; excluded from pytest's test-class discovery."""
+
+    __test__: ClassVar[bool] = False
+
     PASSED = "passed"
     FAILED = "failed"
     SKIPPED = "skipped"
@@ -18,6 +23,8 @@ class TestOutcome(str, Enum):
 @dataclass(frozen=True, slots=True)
 class TestExecution:
     """One observed test execution in a CI stage."""
+
+    __test__: ClassVar[bool] = False
 
     test_id: str
     duration_seconds: float
@@ -33,12 +40,18 @@ class TestExecution:
             raise ValueError("test_id must not be empty")
         if not isfinite(self.duration_seconds) or self.duration_seconds < 0:
             raise ValueError("duration_seconds must be finite and non-negative")
-        if not 0.0 <= self.coverage_score <= 1.0:
-            raise ValueError("coverage_score must be between 0 and 1")
-        if not 0.0 <= self.change_relevance <= 1.0:
-            raise ValueError("change_relevance must be between 0 and 1")
-        if self.last_failure_age_builds is not None and self.last_failure_age_builds < 0:
-            raise ValueError("last_failure_age_builds must be non-negative")
+        if not isfinite(self.coverage_score) or not 0.0 <= self.coverage_score <= 1.0:
+            raise ValueError("coverage_score must be finite and between 0 and 1")
+        if not isfinite(self.change_relevance) or not 0.0 <= self.change_relevance <= 1.0:
+            raise ValueError("change_relevance must be finite and between 0 and 1")
+        if (
+            self.last_failure_age_builds is not None
+            and (
+                isinstance(self.last_failure_age_builds, bool)
+                or self.last_failure_age_builds < 0
+            )
+        ):
+            raise ValueError("last_failure_age_builds must be a non-negative integer")
         try:
             object.__setattr__(self, "outcome", TestOutcome(self.outcome))
             if self.previous_outcome is not None:

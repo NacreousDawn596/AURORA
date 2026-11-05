@@ -5,7 +5,7 @@ import pytest
 from aurora.benchmark.metrics import (
     apfdc,
     fault_recall_at_budget,
-    test_failure_recall_at_budget,
+    observed_failure_recall_at_budget,
     time_to_first_failure,
 )
 from aurora.benchmark.schema import TestExecution, TestOutcome
@@ -20,24 +20,24 @@ def _test(
     return TestExecution(name, duration, outcome, detected_faults=faults)
 
 
-def test_test_failure_recall_counts_only_tests_executed_within_budget() -> None:
+def test_observed_failure_recall_counts_tests_executed_within_budget() -> None:
     tests = [
         _test("pass", 2),
         _test("failed-a", 1, TestOutcome.FAILED),
         _test("failed-b", 2, TestOutcome.FAILED),
     ]
-    assert test_failure_recall_at_budget(tests, 3) == 0.5
-    assert test_failure_recall_at_budget(tests, 5) == 1.0
+    assert observed_failure_recall_at_budget(tests, 3) == 0.5
+    assert observed_failure_recall_at_budget(tests, 5) == 1.0
 
 
-def test_test_failure_recall_is_undefined_without_failures() -> None:
-    assert test_failure_recall_at_budget([_test("ok", 1)], 1) is None
+def test_observed_failure_recall_is_undefined_without_failures() -> None:
+    assert observed_failure_recall_at_budget([_test("ok", 1)], 1) is None
 
 
 def test_failure_recall_rejects_invalid_budget_even_when_undefined() -> None:
     for invalid in (-0.1, math.nan, math.inf):
         with pytest.raises(ValueError, match="finite"):
-            test_failure_recall_at_budget([], invalid)
+            observed_failure_recall_at_budget([], invalid)
 
 
 def test_fault_recall_requires_known_fault_labels() -> None:

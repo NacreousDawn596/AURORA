@@ -1,8 +1,9 @@
-"""Small, dependency-free domain models for the initial scheduler baseline."""
+"""Domain models for the initial deterministic scheduler."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import ClassVar
 
 
 @dataclass(frozen=True, slots=True)
@@ -11,6 +12,8 @@ class TestCandidate:
 
     Risk inputs in v0.1 are illustrative. They are not calibrated predictions.
     """
+
+    __test__: ClassVar[bool] = False
 
     test_id: str
     regression_value: float
@@ -23,11 +26,19 @@ class TestCandidate:
     def __post_init__(self) -> None:
         if not self.test_id.strip():
             raise ValueError("test_id must not be empty")
-        for name in ("regression_value", "information_gain", "resource_cost", "interference_risk"):
-            if getattr(self, name) < 0:
+        for name in (
+            "regression_value",
+            "information_gain",
+            "resource_cost",
+            "interference_risk",
+        ):
+            value = getattr(self, name)
+            if not isinstance(value, (int, float)) or not float("-inf") < value < float("inf"):
+                raise ValueError(f"{name} must be finite")
+            if value < 0:
                 raise ValueError(f"{name} must be non-negative")
-        if self.duration_seconds <= 0:
-            raise ValueError("duration_seconds must be positive")
+        if self.duration_seconds <= 0 or not float("-inf") < self.duration_seconds < float("inf"):
+            raise ValueError("duration_seconds must be finite and positive")
         if not 0 <= self.interference_risk <= 1:
             raise ValueError("interference_risk must be between 0 and 1")
 

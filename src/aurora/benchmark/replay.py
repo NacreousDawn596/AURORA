@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 import math
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Sequence
 
 from aurora.benchmark.metrics import (
     apfdc,
-    test_failure_recall_at_budget,
+    observed_failure_recall_at_budget,
     time_to_first_failure,
 )
 from aurora.benchmark.schema import TestExecution, TestOutcome
@@ -61,11 +61,13 @@ def replay(
         budget_seconds=budget_seconds,
         ordered_test_ids=tuple(test.test_id for test in ordered),
         executed_test_ids=tuple(test.test_id for test in executed),
-        deferred_test_ids=tuple(test.test_id for test in ordered if test.test_id not in executed_ids),
+        deferred_test_ids=tuple(
+            test.test_id for test in ordered if test.test_id not in executed_ids
+        ),
         consumed_seconds=elapsed,
         observed_failed_tests=failed_total,
         detected_failed_tests=failed_detected,
-        test_failure_recall=test_failure_recall_at_budget(ordered, budget_seconds),
+        test_failure_recall=observed_failure_recall_at_budget(ordered, budget_seconds),
         time_to_first_failure_seconds=time_to_first_failure(executed),
         apfdc_value=apfdc(ordered, known_faults),
     )
